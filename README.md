@@ -89,6 +89,20 @@ rviz2 -d /path/to/slam-go2w/humble_ws/src/direct_lidar_inertial_odometry/launch/
 
 Replace `wlan0` with the actual desktop WiFi interface name if needed, and keep `ROS_DOMAIN_ID` matched between robot and desktop if you set one manually.
 
+If your desktop runs Ubuntu 24 and you do not want a native ROS 2 Humble install, use this repository's devcontainer instead. The devcontainer is based on `osrf/ros:humble-desktop` and already runs with host networking, which lets RViz join the same WiFi DDS traffic as the robot.
+
+1. Open this repository in VS Code and reopen it in the devcontainer.
+2. On the Ubuntu host, allow local Docker GUI access if needed:
+   ```bash
+   xhost +local:root
+   ```
+3. Inside the devcontainer, run:
+   ```bash
+   bash scripts/dlio/live_rviz.sh --iface wlan0
+   ```
+
+Replace `wlan0` with the desktop WiFi interface name on your PC, such as `wlp2s0`. This devcontainer flow is intended for desktop visualization only; the robot-side online SLAM stack still uses `docker/robot/run.sh`.
+
 ## Quick start: Record raw sensor data
 
 Record raw IMU + LiDAR data for offline processing with any algorithm:
