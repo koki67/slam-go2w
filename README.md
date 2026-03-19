@@ -66,12 +66,14 @@ You can clone this repository into any directory. In the commands below, replace
    source install/setup.bash
    ```
 
-4. Run D-LIO with catmux:
+4. Create and attach the D-LIO tmux session:
    ```bash
-   catmux /external/catmux/test_dlio.yaml
+   catmux_create_session /external/catmux/test_dlio.yaml
    ```
 
-This session sources `humble_ws/src/unitree_ros2/setup.sh`, which enables CycloneDDS on `eth0` and also `wlan0` when that interface exists on the robot host. Because `docker/robot/run.sh` starts the container with `--net=host`, the container shares the robot host network stack. If the robot host `wlan0` is configured on your WiFi SLAM network (for example `192.168.111.201`), the D-LIO topics are still published over WiFi as in the earlier D-LIO workflow.
+Use `catmux_create_session` to start a session from a YAML config. The plain `catmux` command is only a wrapper around the dedicated tmux server that catmux uses, so it is useful for commands such as `catmux attach` after a session already exists.
+
+This session sources `humble_ws/src/unitree_ros2/setup.sh`, which enables CycloneDDS on `eth0` and also `wlan0` when that interface exists on the robot host. Because `docker/robot/run.sh` starts the container with `--net=host`, the container shares the robot host network stack. If the robot host `wlan0` is configured on your WiFi SLAM network (for example `192.168.111.201`), the D-LIO topics are still published over WiFi from this containerized setup as well.
 
 ### Desktop RViz over WiFi
 
@@ -107,7 +109,7 @@ Replace `wlan0` with the desktop WiFi interface name on your PC, such as `wlp2s0
 
 Record raw IMU + LiDAR data for offline processing with any algorithm:
 ```bash
-catmux /external/catmux/record_raw.yaml
+catmux_create_session /external/catmux/record_raw.yaml
 ```
 Bags are saved to `/external/bags/raw_YYYYMMDD_HHMMSS`.
 
@@ -159,6 +161,13 @@ Use this reconstruction flow for raw sensor bags such as `humble_ws/bags/raw_YYY
 | D-LIO record | `catmux/record_dlio_output.yaml` | Record D-LIO SLAM outputs |
 | Raw record | `catmux/record_raw.yaml` | Record raw inputs for offline processing |
 | D-LIO playback | `catmux/playback_dlio.yaml` | Replay recorded D-LIO outputs |
+
+Create any of these tmux sessions with `catmux_create_session /external/<path-to-yaml>`.
+For example, to record D-LIO outputs:
+```bash
+catmux_create_session /external/catmux/record_dlio_output.yaml
+```
+If a catmux session is already running and you only want to reconnect to it, use `catmux attach`.
 
 ## Sensor calibration
 
