@@ -1,0 +1,21 @@
+expected:
+  imu_topic: /go2w/imu
+  lidar_topic: /points_raw
+  imu_frame: imu_link
+  lidar_frame: hesai_lidar
+  required_point_fields:
+    - x
+    - y
+    - z
+    - intensity
+    - timestamp
+  recommended_point_fields:
+    - ring
+
+thresholds:
+  min_imu_hz_warn: 200.0
+  min_imu_hz_error: 50.0
+  min_lidar_hz_warn: 5.0
+  min_lidar_hz_error: 1.0
+  max_gap_ratio_warn: 5.0
+  max_gap_ratio_error: 20.0
