@@ -1,0 +1,43 @@
+# ROS2 colcon artifacts
+humble_ws/build/
+humble_ws/install/
+humble_ws/log/
+
+# Desktop-only offline D-LIO build artifacts
+.devcontainer/offline_dlio/
+
+# Docker workspace artifacts
+docker/build/
+docker/install/
+docker/log/
+
+# Bag recordings (large binary data, not tracked)
+humble_ws/bags/*/
+
+# Offline GLIM outputs
+output/**
+!output/
+!output/.gitkeep
+!output/logs/
+!output/logs/.gitkeep
+!output/results/
+!output/results/.gitkeep
+!output/reports/
+!output/reports/.gitkeep
+
+# Python cache
+__pycache__/
+*.py[cod]
+*_glim_bag_report.json
+
+# Local tool state
+.claude/settings.local.json
+
+# IDE
+.vscode/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db

@@ -1,0 +1,46 @@
+# GO2-W Sensor Calibration Reference
+#
+# This file is the single source of truth for sensor calibration values
+# used across all SLAM algorithms. Algorithm-specific configs (D-LIO's
+# cfg/dlio.yaml, GLIM's config_sensors.json) contain their own copies
+# in native formats — verify consistency against this file.
+#
+# Robot: Unitree GO2-W
+# LiDAR: Hesai PandarXT-16
+# IMU: Built-in GO2-W IMU (from lowstate)
+
+# --- Frame names ---
+frames:
+  imu: imu_link
+  lidar: hesai_lidar
+  base_link: base_link
+  odom: odom
+
+# --- Topics ---
+topics:
+  imu: /go2w/imu
+  lidar: /points_raw
+
+# --- Extrinsic calibration: base_link -> LiDAR ---
+# Translation [x, y, z] in meters
+T_baselink_lidar:
+  translation: [0.1634, 0.0, 0.116]
+  rotation_quaternion: [0.0, 0.0, 0.0, 1.0]  # [x, y, z, w] identity
+
+# --- IMU noise parameters ---
+imu_noise:
+  accelerometer: 0.05
+  gyroscope: 0.02
+  integration: 0.001
+  bias: 1.0e-5
+
+# --- LiDAR parameters ---
+lidar:
+  model: PandarXT-16
+  ip: 192.168.123.20
+  port: 2368
+
+# --- GLIM-specific timing ---
+glim:
+  imu_time_offset: -0.005  # evidence-based default from timing sweeps
+  points_time_offset: 0.0
