@@ -77,7 +77,9 @@ This session sources `humble_ws/src/unitree_ros2/setup.sh`, which enables Cyclon
 
 ### Desktop RViz over WiFi
 
-To view the live SLAM from a desktop PC on the same WiFi network, configure CycloneDDS on the desktop to use the PC-side WiFi interface, then run RViz with the D-LIO config:
+To view the live SLAM from a desktop PC on the same network, configure CycloneDDS on the desktop to use the PC-side network interface, then run RViz with the D-LIO config:
+
+This native-host flow assumes you already built `humble_ws` locally and therefore have `humble_ws/install/setup.bash`. If you are using this repository's devcontainer for desktop visualization, skip this snippet and use `bash scripts/dlio/live_rviz.sh --iface <desktop_interface>` from inside the devcontainer instead.
 
 ```bash
 source /opt/ros/humble/setup.bash
@@ -89,7 +91,7 @@ export CYCLONEDDS_URI='<CycloneDDS><Domain><General><Interfaces>
 rviz2 -d /path/to/slam-go2w/humble_ws/src/direct_lidar_inertial_odometry/launch/dlio.rviz
 ```
 
-Replace `wlan0` with the actual desktop WiFi interface name if needed, and keep `ROS_DOMAIN_ID` matched between robot and desktop if you set one manually.
+Replace `wlan0` with the actual desktop-side interface name if needed, and keep `ROS_DOMAIN_ID` matched between robot and desktop if you set one manually.
 
 If your desktop runs Ubuntu 24 and you do not want a native ROS 2 Humble install, use this repository's devcontainer instead. The devcontainer is based on `osrf/ros:humble-desktop` and already runs with host networking, which lets RViz join the same WiFi DDS traffic as the robot.
 
@@ -103,7 +105,13 @@ If your desktop runs Ubuntu 24 and you do not want a native ROS 2 Humble install
    bash scripts/dlio/live_rviz.sh --iface wlan0
    ```
 
-Replace `wlan0` with the desktop WiFi interface name on your PC, such as `wlp2s0`. This devcontainer flow is intended for desktop visualization only; the robot-side online SLAM stack still uses `docker/robot/run.sh`.
+Replace `wlan0` with the actual desktop-side interface name on your PC. This is often not `wlan0`; modern Ubuntu systems commonly use names such as `wlp2s0` for WiFi or `enp97s0` for Ethernet / USB NICs. You can check with:
+
+```bash
+ip -br addr
+```
+
+Use the interface that is up on the same subnet as the robot, for example `192.168.111.x`. In a typical setup, the robot may publish over `wlan0` while the desktop listens on a different interface name entirely. This devcontainer flow is intended for desktop visualization only; the robot-side online SLAM stack still uses `docker/robot/run.sh`.
 
 ## Quick start: Record raw sensor data
 

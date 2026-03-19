@@ -14,6 +14,33 @@ REPO_ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
 RVIZ_CFG_DEFAULT="$REPO_ROOT/config/dlio/dlio.rviz"
 IFACE_DEFAULT="${CYCLONEDDS_IFACE:-wlan0}"
 
+source_setup_safely() {
+    local setup_script="$1"
+    local restore_nounset=0
+    local rc=0
+
+    case $- in
+        *u*)
+            restore_nounset=1
+            set +u
+            ;;
+    esac
+
+    export COLCON_TRACE="${COLCON_TRACE-}"
+    # shellcheck source=/dev/null
+    source "$setup_script" || rc=$?
+
+    if [ "$restore_nounset" -eq 1 ]; then
+        set -u
+    fi
+
+    return "$rc"
+}
+
+list_available_interfaces() {
+    find /sys/class/net -mindepth 1 -maxdepth 1 -printf '%f\n' | sort
+}
+
 iface="$IFACE_DEFAULT"
 rviz_cfg="$RVIZ_CFG_DEFAULT"
 
@@ -39,13 +66,13 @@ while [ "$#" -gt 0 ]; do
 done
 
 if [ -z "${ROS_DISTRO:-}" ]; then
-    source /opt/ros/humble/setup.bash
+    source_setup_safely /opt/ros/humble/setup.bash
 fi
 
 desktop_setup="$REPO_ROOT/.devcontainer/offline_dlio/install/setup.bash"
 if [ -f "$desktop_setup" ]; then
     # The postCreate step builds D-LIO once in the desktop container.
-    source "$desktop_setup"
+    source_setup_safely "$desktop_setup"
 fi
 
 if ! command -v rviz2 >/dev/null 2>&1; then
@@ -60,6 +87,13 @@ fi
 
 if [ -z "${DISPLAY:-}" ]; then
     echo "Error: DISPLAY is not set. Start this from a desktop session or fix X11 forwarding." >&2
+    exit 1
+fi
+
+if [ ! -d "/sys/class/net/$iface" ]; then
+    echo "Error: network interface not found: $iface" >&2
+    echo "Available interfaces:" >&2
+    list_available_interfaces >&2
     exit 1
 fi
 
