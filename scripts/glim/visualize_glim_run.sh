@@ -2,6 +2,7 @@
 set -euo pipefail
 
 repo_root=$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)
+input_path=
 run_name=
 run_dir=
 select_latest=0
@@ -19,11 +20,15 @@ run_manifest_path=
 
 usage() {
   cat <<'EOF'
-usage: visualize_glim_run.sh [--latest | --run-name NAME | --run-dir PATH] [options]
+usage: visualize_glim_run.sh <run_path> [options]
+       visualize_glim_run.sh [--latest | --run-name NAME | --run-dir PATH] [options]
 
 Inspect or launch the upstream GLIM offline viewer against a completed dump.
 
 Selectors:
+  <run_path>            Path to a completed run directory. If it points to a
+                        dump directory or dump/graph.bin, the parent run
+                        directory is inferred automatically.
   --latest               Use the most recently modified run under output/results/.
   --run-name NAME        Use output/results/NAME.
   --run-dir PATH         Use an explicit run directory path.
@@ -45,12 +50,14 @@ Options:
   -h, --help             Show this help text.
 
 Examples:
-  scripts/glim/visualize_glim_run.sh --latest
+  scripts/glim/visualize_glim_run.sh output/results/run_name
+  scripts/glim/visualize_glim_run.sh /abs/path/to/output/results/run_name
+  scripts/glim/visualize_glim_run.sh /abs/path/to/output/results/run_name/dump
   scripts/glim/visualize_glim_run.sh --run-name glim_raw_20260311_045358_e2e_cpu_v10
-  scripts/glim/visualize_glim_run.sh --run-dir /abs/path/to/output/results/run_name
-  scripts/glim/visualize_glim_run.sh --latest --summary-only
-  scripts/glim/visualize_glim_run.sh --latest --gpu yes
-  scripts/glim/visualize_glim_run.sh --latest --optimization prompt
+  scripts/glim/visualize_glim_run.sh --latest
+  scripts/glim/visualize_glim_run.sh /abs/path/to/output/results/run_name --summary-only
+  scripts/glim/visualize_glim_run.sh /abs/path/to/output/results/run_name --gpu yes
+  scripts/glim/visualize_glim_run.sh /abs/path/to/output/results/run_name --optimization prompt
 EOF
 }
 
@@ -84,6 +91,38 @@ latest_run_dir() {
     | sort -n \
     | tail -n 1 \
     | cut -d' ' -f2-
+}
+
+resolve_input_run_dir() {
+  local candidate=$1
+  local resolved_path=
+  local parent_dir=
+
+  if [ ! -e "$candidate" ]; then
+    return 1
+  fi
+
+  resolved_path=$(realpath "$candidate")
+
+  if [ -d "$resolved_path" ] && [ -d "$resolved_path/dump" ]; then
+    printf '%s\n' "$resolved_path"
+    return 0
+  fi
+
+  if [ -d "$resolved_path" ] && [ -f "$resolved_path/graph.bin" ] && [ -f "$resolved_path/traj_lidar.txt" ]; then
+    printf '%s\n' "$(dirname "$resolved_path")"
+    return 0
+  fi
+
+  if [ -f "$resolved_path" ] && [ "$(basename "$resolved_path")" = graph.bin ]; then
+    parent_dir=$(dirname "$resolved_path")
+    if [ -f "$parent_dir/traj_lidar.txt" ]; then
+      printf '%s\n' "$(dirname "$parent_dir")"
+      return 0
+    fi
+  fi
+
+  return 1
 }
 
 resolve_default_image() {
@@ -301,14 +340,24 @@ while [ "$#" -gt 0 ]; do
       exit 0
       ;;
     *)
-      echo "unknown argument: $1" >&2
-      usage >&2
-      exit 2
+      if [[ "$1" == -* ]]; then
+        echo "unknown argument: $1" >&2
+        usage >&2
+        exit 2
+      fi
+      if [ -n "$input_path" ]; then
+        echo "multiple run paths provided: $input_path and $1" >&2
+        usage >&2
+        exit 2
+      fi
+      input_path=$1
+      shift
       ;;
   esac
 done
 
 selector_count=0
+[ -n "$input_path" ] && selector_count=$((selector_count + 1))
 [ "$select_latest" -eq 1 ] && selector_count=$((selector_count + 1))
 [ -n "$run_name" ] && selector_count=$((selector_count + 1))
 [ -n "$run_dir" ] && selector_count=$((selector_count + 1))
@@ -318,7 +367,7 @@ if [ "$print_latest" -eq 1 ] && [ "$selector_count" -gt 0 ]; then
 fi
 
 if [ "$selector_count" -gt 1 ]; then
-  fail "choose only one of --latest, --run-name, or --run-dir"
+  fail "choose only one of <run_path>, --latest, --run-name, or --run-dir"
 fi
 
 case "$optimization_mode" in
@@ -343,14 +392,17 @@ if [ "$print_latest" -eq 1 ]; then
   exit 0
 fi
 
-if [ -n "$run_dir" ]; then
+if [ -n "$input_path" ]; then
+  run_dir=$(resolve_input_run_dir "$input_path") \
+    || fail "run path must point to a run directory, dump directory, or dump/graph.bin: $input_path"
+elif [ -n "$run_dir" ]; then
   :
 elif [ -n "$run_name" ]; then
   run_dir=$repo_root/output/results/$run_name
 elif [ "$select_latest" -eq 1 ]; then
   run_dir=$(latest_run_dir) || fail "no run directories found under $repo_root/output/results"
 else
-  fail "one of --latest, --run-name, --run-dir, or --print-latest is required"
+  fail "a run path is required (or use --latest, --run-name, --run-dir, or --print-latest)"
 fi
 
 if [ ! -d "$run_dir" ]; then

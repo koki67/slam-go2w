@@ -156,10 +156,14 @@ Use this reconstruction flow for raw sensor bags such as `humble_ws/bags/raw_YYY
    bash scripts/glim/run_glim_offline.sh --bag /path/to/raw_bag
    ```
 
-3. Visualize results:
+   The command prints the output `results=` directory when it finishes.
+
+3. Visualize a specific run by passing that result directory path:
    ```bash
-   bash scripts/glim/visualize_glim_run.sh --latest
+   bash scripts/glim/visualize_glim_run.sh /path/to/output/results/<run_name>
    ```
+
+   `--latest` is still available as a convenience shortcut, but the standard flow is to visualize the exact run path you want.
 
 ## Catmux sessions
 
