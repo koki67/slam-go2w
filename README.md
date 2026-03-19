@@ -77,6 +77,18 @@ catmux /external/catmux/record_raw.yaml
 ```
 Bags are saved to `/external/bags/raw_YYYYMMDD_HHMMSS`.
 
+## Quick start: Desktop replay of recorded D-LIO outputs
+
+Use this workflow to replay a bag that already contains recorded D-LIO outputs. The wrapper script in this repository is `scripts/dlio/playback.sh`.
+
+1. Open this repository in VS Code and reopen it in the devcontainer
+2. Once the container is ready, open an integrated terminal and run:
+   ```bash
+   bash scripts/dlio/playback.sh humble_ws/bags/slam_YYYYMMDD_HHMMSS
+   ```
+
+RViz2 opens automatically alongside the bag player. The bag loops continuously. Close the RViz2 window or press `Ctrl+C` to stop both.
+
 ## Quick start: Desktop offline D-LIO reconstruction
 
 1. Open the devcontainer in VS Code (or build manually)
@@ -85,6 +97,8 @@ Bags are saved to `/external/bags/raw_YYYYMMDD_HHMMSS`.
    ```bash
    bash scripts/dlio/reconstruct_shared_raw.sh <bag_directory>
    ```
+
+Use this reconstruction flow for raw sensor bags such as `humble_ws/bags/raw_YYYYMMDD_HHMMSS`. Use `scripts/dlio/playback.sh` only for bags that already contain recorded D-LIO outputs such as `slam_YYYYMMDD_HHMMSS`.
 
 ## Quick start: Desktop offline GLIM processing
 
