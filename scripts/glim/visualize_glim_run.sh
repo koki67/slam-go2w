@@ -10,6 +10,7 @@ print_latest=0
 docker_bin=${DOCKER_BIN:-docker}
 image=${GLIM_VIS_IMAGE_TAG:-${GLIM_OFFLINE_IMAGE_TAG:-}}
 optimization_mode=${GO2W_GLIM_VIEWER_OPTIMIZATION:-no}
+gpu_mode=${GO2W_GLIM_VIEWER_GPU:-auto}
 manifest_path=
 viewer_log_path=
 report_dir=
@@ -35,6 +36,10 @@ Options:
                          run_manifest.txt when available, then tries
                          go2w-glim-offline:jazzy_cuda13.1 and
                          go2w-glim-offline:jazzy.
+  --gpu MODE             Viewer GPU mode: auto, yes, or no. Default: auto.
+                         auto reuses use_gpu= from the recorded run manifest
+                         when available, then falls back to inspecting the
+                         resolved dump/config for GPU plugin references.
   --optimization MODE    Viewer load mode for the upstream "Do optimization?"
                          prompt: no, yes, or prompt. Default: no.
   -h, --help             Show this help text.
@@ -44,6 +49,7 @@ Examples:
   scripts/glim/visualize_glim_run.sh --run-name glim_raw_20260311_045358_e2e_cpu_v10
   scripts/glim/visualize_glim_run.sh --run-dir /abs/path/to/output/results/run_name
   scripts/glim/visualize_glim_run.sh --latest --summary-only
+  scripts/glim/visualize_glim_run.sh --latest --gpu yes
   scripts/glim/visualize_glim_run.sh --latest --optimization prompt
 EOF
 }
@@ -105,6 +111,75 @@ resolve_default_image() {
   done
 
   return 1
+}
+
+manifest_value() {
+  local path=$1
+  local key=$2
+
+  if [ -f "$path" ]; then
+    sed -n "s/^${key}=//p" "$path" | head -n 1
+  fi
+}
+
+config_uses_gpu() {
+  local config_dir=$1
+  local config_json=$config_dir/config.json
+
+  if [ ! -f "$config_json" ]; then
+    return 1
+  fi
+
+  if grep -Eq '"config_(odometry|sub_mapping|global_mapping)"[[:space:]]*:[[:space:]]*"[^"]*_gpu\.json"' "$config_json"; then
+    return 0
+  fi
+
+  return 1
+}
+
+resolve_viewer_use_gpu() {
+  local mode=$1
+  local recorded_use_gpu=
+  local config_dir=
+
+  case "$mode" in
+    yes)
+      printf '1\n'
+      return 0
+      ;;
+    no)
+      printf '0\n'
+      return 0
+      ;;
+    auto)
+      ;;
+    *)
+      return 1
+      ;;
+  esac
+
+  if [ -n "${run_manifest_path:-}" ] && [ -f "$run_manifest_path" ]; then
+    recorded_use_gpu=$(manifest_value "$run_manifest_path" use_gpu)
+    case "$recorded_use_gpu" in
+      1)
+        printf '1\n'
+        return 0
+        ;;
+      0)
+        printf '0\n'
+        return 0
+        ;;
+    esac
+  fi
+
+  for config_dir in "$dump_dir/config" "$resolved_config"; do
+    if config_uses_gpu "$config_dir"; then
+      printf '1\n'
+      return 0
+    fi
+  done
+
+  printf '0\n'
 }
 
 resolve_xauthority() {
@@ -213,6 +288,10 @@ while [ "$#" -gt 0 ]; do
       image=$2
       shift 2
       ;;
+    --gpu)
+      gpu_mode=$2
+      shift 2
+      ;;
     --optimization)
       optimization_mode=$2
       shift 2
@@ -247,6 +326,14 @@ case "$optimization_mode" in
     ;;
   *)
     fail "unsupported --optimization value: $optimization_mode (expected yes, no, or prompt)"
+    ;;
+esac
+
+case "$gpu_mode" in
+  auto|yes|no)
+    ;;
+  *)
+    fail "unsupported --gpu value: $gpu_mode (expected auto, yes, or no)"
     ;;
 esac
 
@@ -315,6 +402,7 @@ run_name=$resolved_run_name
 run_dir=$run_dir
 dump_dir=$dump_dir
 image=${image:-auto}
+gpu_mode=$gpu_mode
 optimization_mode=$optimization_mode
 viewer_log=$viewer_log_path
 EOF
@@ -372,6 +460,10 @@ xauth_file=$(resolve_xauthority) \
 printf 'display=%s\nxauthority=%s\n' "$DISPLAY" "$xauth_file" >> "$manifest_path"
 printf 'stage.display_check=passed\n' >> "$manifest_path"
 
+viewer_use_gpu=$(resolve_viewer_use_gpu "$gpu_mode") \
+  || fail_stage "runtime_setup" "failed to resolve viewer GPU mode from --gpu=$gpu_mode"
+printf 'viewer_use_gpu=%s\n' "$viewer_use_gpu" >> "$manifest_path"
+
 viewer_cmd='set -eo pipefail; set +u; . /opt/glim_ros2/install/setup.bash; set -u; ros2 run glim_ros offline_viewer /work/run/dump'
 if [ -d "$resolved_config" ]; then
   viewer_cmd+=' --config_path /work/run/resolved_config'
@@ -392,12 +484,20 @@ docker_cmd=(
   -v "$log_dir:/work/output/logs"
   -v "$repo_root/docker/desktop/glim/bin/zenity_auto_answer.sh:/opt/go2w/bin/zenity:ro"
   -v "$run_dir:/work/run:ro"
+)
+
+if [ "$viewer_use_gpu" -eq 1 ]; then
+  docker_cmd+=(--gpus all)
+fi
+
+docker_cmd+=(
   "$resolved_image"
   -lc "$viewer_cmd"
 )
 
 log "Launching offline_viewer for run=$resolved_run_name"
 log "Viewer log: $viewer_log_path"
+log "Viewer GPU access: $( [ "$viewer_use_gpu" -eq 1 ] && printf 'enabled' || printf 'disabled' )"
 
 set +e
 "${docker_cmd[@]}" 2>&1 | tee "$viewer_log_path"
