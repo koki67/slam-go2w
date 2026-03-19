@@ -40,14 +40,16 @@ slam-go2w/
 
 Clone with submodules:
 ```bash
-git clone --recurse-submodules https://github.com/koki67/slam-go2w.git ~/ws/slam-go2w
+git clone --recurse-submodules https://github.com/koki67/slam-go2w.git
 ```
+
+You can clone this repository into any directory. In the commands below, replace `/path/to/slam-go2w` with your local checkout path.
 
 ## Quick start: Online D-LIO (on robot)
 
 1. Build the robot Docker image:
    ```bash
-   cd ~/ws/slam-go2w
+   cd /path/to/slam-go2w
    docker build -f docker/robot/Dockerfile -t go2w-humble:latest .
    ```
 
