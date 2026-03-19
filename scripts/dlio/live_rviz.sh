@@ -2,10 +2,10 @@
 # Launch RViz2 for live D-LIO visualization from a desktop-side Humble container.
 #
 # Usage:
-#   bash scripts/dlio/live_rviz.sh [--iface <network_interface>] [--config <rviz_config>]
+#   bash scripts/dlio/live_rviz.sh [--iface <desktop_interface>] [--config <rviz_config>]
 #
 # Example:
-#   bash scripts/dlio/live_rviz.sh --iface wlan0
+#   bash scripts/dlio/live_rviz.sh --iface enp97s0
 
 set -euo pipefail
 

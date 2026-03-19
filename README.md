@@ -91,7 +91,7 @@ export CYCLONEDDS_URI='<CycloneDDS><Domain><General><Interfaces>
 rviz2 -d /path/to/slam-go2w/humble_ws/src/direct_lidar_inertial_odometry/launch/dlio.rviz
 ```
 
-Replace `wlan0` with the actual desktop-side interface name if needed, and keep `ROS_DOMAIN_ID` matched between robot and desktop if you set one manually.
+Replace `wlan0` with the actual desktop-side interface name if needed. On this desktop host, the matching interface is `enp97s0`, not `wlan0`. Keep `ROS_DOMAIN_ID` matched between robot and desktop if you set one manually.
 
 If your desktop runs Ubuntu 24 and you do not want a native ROS 2 Humble install, use this repository's devcontainer instead. The devcontainer is based on `osrf/ros:humble-desktop` and already runs with host networking, which lets RViz join the same WiFi DDS traffic as the robot.
 
@@ -102,16 +102,16 @@ If your desktop runs Ubuntu 24 and you do not want a native ROS 2 Humble install
    ```
 3. Inside the devcontainer, run:
    ```bash
-   bash scripts/dlio/live_rviz.sh --iface wlan0
+   bash scripts/dlio/live_rviz.sh --iface enp97s0
    ```
 
-Replace `wlan0` with the actual desktop-side interface name on your PC. This is often not `wlan0`; modern Ubuntu systems commonly use names such as `wlp2s0` for WiFi or `enp97s0` for Ethernet / USB NICs. You can check with:
+On this desktop PC, `ip -br addr` shows `enp97s0` is `UP` on `192.168.111.100/24`, so `enp97s0` is the correct interface to use here. `wlan0` is the robot-side name that often appears in the online SLAM setup, but the desktop can use a different interface name entirely even when it is on the same subnet. You can re-check with:
 
 ```bash
 ip -br addr
 ```
 
-Use the interface that is up on the same subnet as the robot, for example `192.168.111.x`. In a typical setup, the robot may publish over `wlan0` while the desktop listens on a different interface name entirely. This devcontainer flow is intended for desktop visualization only; the robot-side online SLAM stack still uses `docker/robot/run.sh`.
+If the network setup changes, use the interface that is `UP` on the same subnet as the robot, for example `192.168.111.x`. This devcontainer flow is intended for desktop visualization only; the robot-side online SLAM stack still uses `docker/robot/run.sh`.
 
 ## Quick start: Record raw sensor data
 
