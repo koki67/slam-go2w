@@ -71,6 +71,24 @@ You can clone this repository into any directory. In the commands below, replace
    catmux /external/catmux/test_dlio.yaml
    ```
 
+This session sources `humble_ws/src/unitree_ros2/setup.sh`, which enables CycloneDDS on `eth0` and also `wlan0` when that interface exists on the robot host. Because `docker/robot/run.sh` starts the container with `--net=host`, the container shares the robot host network stack. If the robot host `wlan0` is configured on your WiFi SLAM network (for example `192.168.111.201`), the D-LIO topics are still published over WiFi as in the earlier D-LIO workflow.
+
+### Desktop RViz over WiFi
+
+To view the live SLAM from a desktop PC on the same WiFi network, configure CycloneDDS on the desktop to use the PC-side WiFi interface, then run RViz with the D-LIO config:
+
+```bash
+source /opt/ros/humble/setup.bash
+source /path/to/slam-go2w/humble_ws/install/setup.bash
+export RMW_IMPLEMENTATION=rmw_cyclonedds_cpp
+export CYCLONEDDS_URI='<CycloneDDS><Domain><General><Interfaces>
+  <NetworkInterface name="wlan0" priority="2" multicast="true" />
+</Interfaces></General></Domain></CycloneDDS>'
+rviz2 -d /path/to/slam-go2w/humble_ws/src/direct_lidar_inertial_odometry/launch/dlio.rviz
+```
+
+Replace `wlan0` with the actual desktop WiFi interface name if needed, and keep `ROS_DOMAIN_ID` matched between robot and desktop if you set one manually.
+
 ## Quick start: Record raw sensor data
 
 Record raw IMU + LiDAR data for offline processing with any algorithm:
