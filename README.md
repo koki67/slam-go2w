@@ -180,6 +180,7 @@ For example, to record D-LIO outputs:
 catmux_create_session /external/catmux/record_dlio_output.yaml
 ```
 If a catmux session is already running and you only want to reconnect to it, use `catmux attach`.
+For `catmux/playback_dlio.yaml`, playback stops after one pass by default; set `bag_play_args: --loop` if you want continuous replay.
 
 ## Sensor calibration
 
