@@ -45,7 +45,7 @@ Visualization Manager:
           Frames:
             All Enabled: true
           Marker Alpha: 1
-          Marker Scale: 5
+          Marker Scale: 3
           Name: tf tree
           Show Arrows: true
           Show Axes: true
@@ -59,7 +59,7 @@ Visualization Manager:
           Enabled: false
           Length: 1
           Name: odom
-          Radius: 0.25
+          Radius: 0.1
           Reference Frame: odom
           Show Trail: false
           Value: false
@@ -68,7 +68,7 @@ Visualization Manager:
           Enabled: false
           Length: 1
           Name: base_link
-          Radius: 0.25
+          Radius: 0.1
           Reference Frame: base_link
           Show Trail: false
           Value: false
@@ -195,7 +195,7 @@ Visualization Manager:
           Shape:
             Alpha: 1
             Axes Length: 1
-            Axes Radius: 0.25
+            Axes Radius: 0.1
             Color: 255; 25; 0
             Head Length: 0.30000001192092896
             Head Radius: 0.10000000149011612
@@ -208,7 +208,7 @@ Visualization Manager:
         - Alpha: 1
           Arrow Length: 0.30000001192092896
           Axes Length: 0.5
-          Axes Radius: 0.10000000149011612
+          Axes Radius: 0.05000000074505806
           Class: rviz_default_plugins/PoseArray
           Color: 255; 25; 0
           Enabled: false
