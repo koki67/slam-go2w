@@ -2,22 +2,27 @@
 # Play a recorded SLAM bag and open RViz2 in one command.
 #
 # Usage (from anywhere inside the workspace):
-#   bash scripts/dlio/playback.sh <bag_directory> [--loop] [ros2 bag play args...]
+#   bash scripts/dlio/playback.sh <bag_directory> [--world-only] [--loop] [ros2 bag play args...]
 #
 # Examples:
 #   bash scripts/dlio/playback.sh humble_ws/bags/slam_20250301_143022
 #   bash scripts/dlio/playback.sh humble_ws/bags/slam_20250301_143022 --rate 2.0
 #   bash scripts/dlio/playback.sh humble_ws/bags/slam_20250301_143022 --loop
+#   bash scripts/dlio/playback.sh humble_ws/bags/slam_20250301_143022 --world-only
 
 set -e
 
-BAG="${1:?Error: bag path required. Usage: $0 <bag_directory> [--loop] [ros2 bag play args...]}"
+BAG="${1:?Error: bag path required. Usage: $0 <bag_directory> [--world-only] [--loop] [ros2 bag play args...]}"
 shift
 LOOP=false
+WORLD_ONLY=false
 EXTRA_ARGS=()
 
 while [ $# -gt 0 ]; do
     case "$1" in
+        --world-only)
+            WORLD_ONLY=true
+            ;;
         --loop)
             LOOP=true
             ;;
@@ -31,6 +36,9 @@ done
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
 RVIZ_CFG="$REPO_ROOT/config/dlio/dlio.rviz"
+if [ "$WORLD_ONLY" = true ]; then
+    RVIZ_CFG="$REPO_ROOT/config/dlio/dlio_world_only.rviz"
+fi
 
 # Source ROS 2 if not already sourced.
 if [ -z "$ROS_DISTRO" ]; then
