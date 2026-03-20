@@ -66,9 +66,9 @@ You can clone this repository into any directory. In the commands below, replace
    source install/setup.bash
    ```
 
-4. Create and attach the D-LIO tmux session:
+4. Create and attach the online D-LIO tmux session:
    ```bash
-   catmux_create_session /external/catmux/test_dlio.yaml
+   catmux_create_session /external/catmux/online_dlio.yaml
    ```
 
 Use `catmux_create_session` to start a session from a YAML config. The plain `catmux` command is only a wrapper around the dedicated tmux server that catmux uses, so it is useful for commands such as `catmux attach` after a session already exists.
@@ -169,7 +169,7 @@ Use this reconstruction flow for raw sensor bags such as `humble_ws/bags/raw_YYY
 
 | Session | File | Purpose |
 |---------|------|---------|
-| D-LIO test | `catmux/test_dlio.yaml` | Online D-LIO (sensors + SLAM) |
+| D-LIO online | `catmux/online_dlio.yaml` | Online D-LIO (sensors + SLAM) |
 | D-LIO record | `catmux/record_dlio_output.yaml` | Record D-LIO SLAM outputs |
 | Raw record | `catmux/record_raw.yaml` | Record raw inputs for offline processing |
 | D-LIO playback | `catmux/playback_dlio.yaml` | Replay recorded D-LIO outputs |
