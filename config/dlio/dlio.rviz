@@ -57,7 +57,7 @@ Visualization Manager:
         - Alpha: 1
           Class: rviz_default_plugins/Axes
           Enabled: false
-          Length: 1
+          Length: 0.7
           Name: odom
           Radius: 0.1
           Reference Frame: odom
@@ -66,7 +66,7 @@ Visualization Manager:
         - Alpha: 1
           Class: rviz_default_plugins/Axes
           Enabled: false
-          Length: 1
+          Length: 0.7
           Name: base_link
           Radius: 0.1
           Reference Frame: base_link
@@ -194,7 +194,7 @@ Visualization Manager:
           Queue Size: 1000
           Shape:
             Alpha: 1
-            Axes Length: 1
+            Axes Length: 0.7
             Axes Radius: 0.1
             Color: 255; 25; 0
             Head Length: 0.30000001192092896
@@ -207,7 +207,7 @@ Visualization Manager:
           Value: true
         - Alpha: 1
           Arrow Length: 0.30000001192092896
-          Axes Length: 0.5
+          Axes Length: 0.35
           Axes Radius: 0.05000000074505806
           Class: rviz_default_plugins/PoseArray
           Color: 255; 25; 0
