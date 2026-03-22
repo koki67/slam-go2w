@@ -2,18 +2,16 @@
 # Launch RViz2 for live D-LIO visualization from a desktop-side Humble container.
 #
 # Usage:
-#   bash scripts/dlio/live_rviz.sh [--iface <desktop_interface>] [--config <rviz_config>] [--world-only]
+#   bash scripts/dlio/live_rviz.sh [--iface <desktop_interface>] [--config <rviz_config>]
 #
 # Example:
 #   bash scripts/dlio/live_rviz.sh --iface enp97s0
-#   bash scripts/dlio/live_rviz.sh --iface enp97s0 --world-only
 
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
 RVIZ_CFG_DEFAULT="$REPO_ROOT/config/dlio/dlio.rviz"
-RVIZ_CFG_WORLD_ONLY="$REPO_ROOT/config/dlio/dlio_world_only.rviz"
 IFACE_DEFAULT="${CYCLONEDDS_IFACE:-wlan0}"
 
 source_setup_safely() {
@@ -45,8 +43,6 @@ list_available_interfaces() {
 
 iface="$IFACE_DEFAULT"
 rviz_cfg="$RVIZ_CFG_DEFAULT"
-rviz_cfg_explicit=0
-world_only=0
 
 while [ "$#" -gt 0 ]; do
     case "$1" in
@@ -56,15 +52,10 @@ while [ "$#" -gt 0 ]; do
             ;;
         --config)
             rviz_cfg="${2:?Error: --config requires a value}"
-            rviz_cfg_explicit=1
             shift 2
             ;;
-        --world-only)
-            world_only=1
-            shift
-            ;;
         -h|--help)
-            sed -n '2,9p' "$0"
+            sed -n '2,8p' "$0"
             exit 0
             ;;
         *)
@@ -73,14 +64,6 @@ while [ "$#" -gt 0 ]; do
             ;;
     esac
 done
-
-if [ "$world_only" -eq 1 ]; then
-    if [ "$rviz_cfg_explicit" -eq 1 ]; then
-        echo "Error: --world-only cannot be combined with --config" >&2
-        exit 1
-    fi
-    rviz_cfg="$RVIZ_CFG_WORLD_ONLY"
-fi
 
 if [ -z "${ROS_DISTRO:-}" ]; then
     source_setup_safely /opt/ros/humble/setup.bash
@@ -122,8 +105,5 @@ export CYCLONEDDS_URI="<CycloneDDS><Domain><General><Interfaces>
 echo "RMW_IMPLEMENTATION=$RMW_IMPLEMENTATION"
 echo "CycloneDDS interface: $iface"
 echo "RViz config: $rviz_cfg"
-if [ "$world_only" -eq 1 ]; then
-    echo "RViz UI mode: world-only"
-fi
 
 rviz2 -d "$rviz_cfg"

@@ -105,12 +105,6 @@ If your desktop runs Ubuntu 24 and you do not want a native ROS 2 Humble install
    bash scripts/dlio/live_rviz.sh --iface enp97s0
    ```
 
-If you want a recording-friendly RViz layout that hides the side docks and leaves the 3D world view dominant, add `--world-only`:
-
-```bash
-bash scripts/dlio/live_rviz.sh --iface enp97s0 --world-only
-```
-
 On this desktop PC, `ip -br addr` shows `enp97s0` is `UP` on `192.168.111.100/24`, so `enp97s0` is the correct interface to use here. `wlan0` is the robot-side name that often appears in the online SLAM setup, but the desktop can use a different interface name entirely even when it is on the same subnet. You can re-check with:
 
 ```bash
@@ -118,35 +112,6 @@ ip -br addr
 ```
 
 If the network setup changes, use the interface that is `UP` on the same subnet as the robot, for example `192.168.111.x`. This devcontainer flow is intended for desktop visualization only; the robot-side online SLAM stack still uses `docker/robot/run.sh`.
-
-### Record the RViz window
-
-This repository now includes `scripts/dlio/record_rviz_window.sh`, which waits for a visible RViz window and records that X11/Xwayland window with `ffmpeg`.
-
-The helper expects `ffmpeg` plus either `xdotool` or `xwininfo` to be available in the environment where you run it.
-
-Start the recorder first if you want it to block until RViz appears:
-
-```bash
-bash scripts/dlio/record_rviz_window.sh
-```
-
-Then launch RViz in another terminal:
-
-```bash
-bash scripts/dlio/live_rviz.sh --iface enp97s0 --world-only
-```
-
-The recorder captures the whole RViz window. `--world-only` hides the side docks so the black 3D view takes most of the frame while still keeping the current default UI unchanged for normal use. Stop the recording with `q` or `Ctrl+C` in the recorder terminal.
-
-Avoid resizing or minimizing the RViz window while recording. The helper tracks the RViz top-level window, not the inner render widget.
-
-The recorder accepts a few useful options:
-
-- `--output /path/to/file.mp4` to choose the output path.
-- `--framerate 60` to change the capture frame rate.
-- `--show-cursor` to include the mouse pointer while you orbit, pan, or zoom.
-- `--timeout 30` to stop waiting if RViz does not appear.
 
 ## Quick start: Record raw sensor data
 

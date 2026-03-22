@@ -2,19 +2,17 @@
 # Reconstruct D-LIO outputs from a raw sensor bag and open RViz2.
 #
 # Usage (from anywhere inside the repository):
-#   bash scripts/dlio/reconstruct_shared_raw.sh <bag_directory> [--world-only] [ros2 bag play args...]
+#   bash scripts/dlio/reconstruct_shared_raw.sh <bag_directory> [ros2 bag play args...]
 #
 # Examples:
 #   bash scripts/dlio/reconstruct_shared_raw.sh humble_ws/bags/raw_20260312_024403
 #   bash scripts/dlio/reconstruct_shared_raw.sh humble_ws/bags/raw_20260312_024403 --rate 2.0
-#   bash scripts/dlio/reconstruct_shared_raw.sh humble_ws/bags/raw_20260312_024403 --world-only
 
 set -eo pipefail
 
-BAG="${1:?Error: bag path required. Usage: $0 <bag_directory> [--world-only] [ros2 bag play args...]}"
+BAG="${1:?Error: bag path required. Usage: $0 <bag_directory> [ros2 bag play args...]}"
 shift
-WORLD_ONLY=false
-EXTRA_ARGS=()
+EXTRA_ARGS=("$@")
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
@@ -25,22 +23,6 @@ WS_SETUP_CANDIDATES=(
     "$REPO_ROOT/.devcontainer/offline_dlio/install/setup.bash"
     "$REPO_ROOT/humble_ws/install/setup.bash"
 )
-
-while [ $# -gt 0 ]; do
-    case "$1" in
-        --world-only)
-            WORLD_ONLY=true
-            ;;
-        *)
-            EXTRA_ARGS+=("$1")
-            ;;
-    esac
-    shift
-done
-
-if [ "$WORLD_ONLY" = true ]; then
-    RVIZ_CFG="$REPO_ROOT/config/dlio/dlio_world_only.rviz"
-fi
 
 if [ ! -d "$BAG" ] && [ -d "$REPO_ROOT/$BAG" ]; then
     BAG="$REPO_ROOT/$BAG"
