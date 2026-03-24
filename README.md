@@ -131,11 +131,10 @@ RViz2 opens automatically alongside the bag player. The bag plays once. Close th
 
 ## Quick start: Desktop offline D-LIO reconstruction
 
-1. Open the devcontainer in VS Code (or build manually)
-2. The `postCreate.sh` script builds D-LIO automatically
-3. Run reconstruction:
+1. Open this repository in VS Code and reopen it in the devcontainer.
+2. Once the container is ready, run reconstruction:
    ```bash
-   bash scripts/dlio/reconstruct_shared_raw.sh <bag_directory>
+   bash scripts/dlio/reconstruct_raw.sh <bag_directory>
    ```
 
 Use this reconstruction flow for raw sensor bags such as `humble_ws/bags/raw_YYYYMMDD_HHMMSS`. Use `scripts/dlio/playback.sh` only for bags that already contain recorded D-LIO outputs such as `dlio_YYYYMMDD__HHMMSS`.
