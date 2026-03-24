@@ -81,18 +81,14 @@ For desktop visualization, use this repository's devcontainer. It is based on `o
    ```bash
    xhost +si:localuser:root
    ```
-3. Inside the devcontainer, check which desktop network interface is `UP` on the same subnet as the robot:
+3. Inside the devcontainer, run:
    ```bash
-   ip -br addr
-   ```
-4. Inside the devcontainer, run:
-   ```bash
-   bash scripts/dlio/live_rviz.sh --iface <desktop_interface>
+   bash scripts/dlio/live_rviz.sh --iface enp97s0
    ```
 
-Replace `<desktop_interface>` with the actual desktop-side interface name, for example `enp97s0`. The desktop interface name does not need to match the robot-side `wlan0`. Keep `ROS_DOMAIN_ID` matched between robot and desktop if you set one manually.
+Replace `enp97s0` with the actual desktop-side interface name. Keep `ROS_DOMAIN_ID` matched between robot and desktop if you set one manually.
 
-If the network setup changes, re-run `ip -br addr` and use the interface that is `UP` on the same subnet as the robot, for example `192.168.111.x`. Run `xhost +si:localuser:root` only for the current desktop session rather than putting it in `~/.bashrc`.
+If the network setup changes, run `ip -br addr` and use the interface that is `UP` on the same subnet as the robot.
 
 ## Quick start: Record raw sensor data
 
