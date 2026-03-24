@@ -158,7 +158,7 @@ Use this reconstruction flow for raw sensor bags such as `humble_ws/bags/raw_YYY
    bash scripts/glim/visualize_glim_run.sh ~/ws/slam-go2w/output/results/<run_name>
    ```
 
-   `--latest` is still available as a convenience shortcut, but the standard flow is to visualize the exact run path you want.
+   `--latest` is available if you just want to open the most recently modified run under `output/results/`, but the standard flow is to pass the exact run directory path you want to inspect.
 
 ## Catmux sessions
 
