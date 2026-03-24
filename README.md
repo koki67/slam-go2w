@@ -90,6 +90,25 @@ Replace `enp97s0` with the actual desktop-side interface name. Keep `ROS_DOMAIN_
 
 If the network setup changes, run `ip -br addr` and use the interface that is `UP` on the same subnet as the robot.
 
+## Quick start: Record D-LIO outputs (on robot)
+
+Use this workflow when you want a compact replay bag that contains the online D-LIO outputs:
+```bash
+catmux_create_session /external/catmux/record_dlio.yaml
+```
+
+This session runs the same live robot-side stack as `online_dlio.yaml` and additionally records these topics for replay and visualization:
+- `/dlio/odom_node/odom`
+- `/dlio/odom_node/path`
+- `/dlio/odom_node/keyframes`
+- `/dlio/odom_node/pointcloud/deskewed`
+- `/map`
+- `/tf`
+- `/tf_static`
+
+Bags are saved to `/external/bags/dlio_YYYYMMDD__HHMMSS`.
+Use this bag type with `bash scripts/dlio/playback.sh humble_ws/bags/dlio_YYYYMMDD__HHMMSS` for desktop replay.
+
 ## Quick start: Record raw sensor data
 
 Record raw IMU + LiDAR data for offline processing with any algorithm:
@@ -100,12 +119,12 @@ Bags are saved to `/external/bags/raw_YYYYMMDD_HHMMSS`.
 
 ## Quick start: Desktop replay of recorded D-LIO outputs
 
-Use this workflow to replay a bag that already contains recorded D-LIO outputs. The wrapper script in this repository is `scripts/dlio/playback.sh`.
+Use this workflow to replay a `dlio_YYYYMMDD__HHMMSS` bag recorded by `catmux/record_dlio.yaml`. The wrapper script in this repository is `scripts/dlio/playback.sh`.
 
 1. Open this repository in VS Code and reopen it in the devcontainer
 2. Once the container is ready, open an integrated terminal and run:
    ```bash
-   bash scripts/dlio/playback.sh humble_ws/bags/slam_YYYYMMDD_HHMMSS
+   bash scripts/dlio/playback.sh humble_ws/bags/dlio_YYYYMMDD__HHMMSS
    ```
 
 RViz2 opens automatically alongside the bag player. The bag loops continuously. Close the RViz2 window or press `Ctrl+C` to stop both.
@@ -119,7 +138,7 @@ RViz2 opens automatically alongside the bag player. The bag loops continuously. 
    bash scripts/dlio/reconstruct_shared_raw.sh <bag_directory>
    ```
 
-Use this reconstruction flow for raw sensor bags such as `humble_ws/bags/raw_YYYYMMDD_HHMMSS`. Use `scripts/dlio/playback.sh` only for bags that already contain recorded D-LIO outputs such as `slam_YYYYMMDD_HHMMSS`.
+Use this reconstruction flow for raw sensor bags such as `humble_ws/bags/raw_YYYYMMDD_HHMMSS`. Use `scripts/dlio/playback.sh` only for bags that already contain recorded D-LIO outputs such as `dlio_YYYYMMDD__HHMMSS`.
 
 ## Quick start: Desktop offline GLIM processing
 
@@ -147,14 +166,14 @@ Use this reconstruction flow for raw sensor bags such as `humble_ws/bags/raw_YYY
 | Session | File | Purpose |
 |---------|------|---------|
 | D-LIO online | `catmux/online_dlio.yaml` | Online D-LIO (sensors + SLAM) |
-| D-LIO record | `catmux/record_dlio_output.yaml` | Record D-LIO SLAM outputs |
+| D-LIO record | `catmux/record_dlio.yaml` | Record D-LIO SLAM outputs |
 | Raw record | `catmux/record_raw.yaml` | Record raw inputs for offline processing |
 | D-LIO playback | `catmux/playback_dlio.yaml` | Replay recorded D-LIO outputs |
 
 Create any of these tmux sessions with `catmux_create_session /external/<path-to-yaml>`.
 For example, to record D-LIO outputs:
 ```bash
-catmux_create_session /external/catmux/record_dlio_output.yaml
+catmux_create_session /external/catmux/record_dlio.yaml
 ```
 If a catmux session is already running and you only want to reconnect to it, use `catmux attach`.
 For `catmux/playback_dlio.yaml`, playback stops after one pass by default; set `bag_play_args: --loop` if you want continuous replay.

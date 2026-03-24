@@ -132,8 +132,11 @@ def load_repo_defaults(repo_path: Path) -> dict[str, Any]:
     launch_path = repo_path / "humble_ws/src/direct_lidar_inertial_odometry/launch/dlio.launch.py"
     params_path = repo_path / "humble_ws/src/direct_lidar_inertial_odometry/cfg/params.yaml"
 
-    # Support both unified repo layout (catmux/) and legacy layout (humble_ws/src/)
-    record_path = repo_path / "catmux/record_dlio_output.yaml"
+    # Support the current unified repo layout, the older unified file name,
+    # and the legacy layout (humble_ws/src/).
+    record_path = repo_path / "catmux/record_dlio.yaml"
+    if not record_path.exists():
+        record_path = repo_path / "catmux/record_dlio_output.yaml"
     if not record_path.exists():
         record_path = repo_path / "humble_ws/src/record_catmux.yaml"
 
