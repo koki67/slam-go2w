@@ -43,19 +43,18 @@ Clone with submodules:
 git clone --recurse-submodules https://github.com/koki67/slam-go2w.git
 ```
 
-You can clone this repository into any directory. In the commands below, replace `/path/to/slam-go2w` with your local checkout path.
+The examples below assume this repository is cloned at `~/ws/slam-go2w`. Adjust the path if your workspace lives elsewhere.
 
 ## Quick start: Online D-LIO (on robot)
 
 1. Build the robot Docker image:
    ```bash
-   cd /path/to/slam-go2w
-   docker build -f docker/robot/Dockerfile -t go2w-humble:latest .
+   docker build -f ~/ws/slam-go2w/docker/robot/Dockerfile -t go2w-humble:latest ~/ws/slam-go2w
    ```
 
 2. Start the container:
    ```bash
-   bash docker/robot/run.sh
+   bash ~/ws/slam-go2w/docker/robot/run.sh
    ```
 
 3. Inside the container, build the workspace:
@@ -71,47 +70,29 @@ You can clone this repository into any directory. In the commands below, replace
    catmux_create_session /external/catmux/online_dlio.yaml
    ```
 
-Use `catmux_create_session` to start a session from a YAML config. The plain `catmux` command is only a wrapper around the dedicated tmux server that catmux uses, so it is useful for commands such as `catmux attach` after a session already exists.
-
-This session sources `humble_ws/src/unitree_ros2/setup.sh`, which enables CycloneDDS on `eth0` and also `wlan0` when that interface exists on the robot host. Because `docker/robot/run.sh` starts the container with `--net=host`, the container shares the robot host network stack. If the robot host `wlan0` is configured on your WiFi SLAM network (for example `192.168.111.201`), the D-LIO topics are still published over WiFi from this containerized setup as well.
+This session sources `humble_ws/src/unitree_ros2/setup.sh`, which enables CycloneDDS on `eth0` and also `wlan0` when that interface exists on the robot host. If the robot host `wlan0` is configured on your WiFi network, the D-LIO topics are published over WiFi from this containerized setup as well.
 
 ### Desktop RViz over WiFi
 
-To view the live SLAM from a desktop PC on the same network, configure CycloneDDS on the desktop to use the PC-side network interface, then run RViz with the D-LIO config:
+For desktop visualization, use this repository's devcontainer. It is based on `osrf/ros:humble-desktop` and already runs with host networking, which lets RViz join the same WiFi DDS traffic as the robot.
 
-This native-host flow assumes you already built `humble_ws` locally and therefore have `humble_ws/install/setup.bash`. If you are using this repository's devcontainer for desktop visualization, skip this snippet and use `bash scripts/dlio/live_rviz.sh --iface <desktop_interface>` from inside the devcontainer instead.
-
-```bash
-source /opt/ros/humble/setup.bash
-source /path/to/slam-go2w/humble_ws/install/setup.bash
-export RMW_IMPLEMENTATION=rmw_cyclonedds_cpp
-export CYCLONEDDS_URI='<CycloneDDS><Domain><General><Interfaces>
-  <NetworkInterface name="wlan0" priority="2" multicast="true" />
-</Interfaces></General></Domain></CycloneDDS>'
-rviz2 -d /path/to/slam-go2w/humble_ws/src/direct_lidar_inertial_odometry/launch/dlio.rviz
-```
-
-Replace `wlan0` with the actual desktop-side interface name if needed. On this desktop host, the matching interface is `enp97s0`, not `wlan0`. Keep `ROS_DOMAIN_ID` matched between robot and desktop if you set one manually.
-
-If your desktop runs Ubuntu 24 and you do not want a native ROS 2 Humble install, use this repository's devcontainer instead. The devcontainer is based on `osrf/ros:humble-desktop` and already runs with host networking, which lets RViz join the same WiFi DDS traffic as the robot.
-
-1. Open this repository in VS Code and reopen it in the devcontainer.
-2. On the Ubuntu host, allow local Docker GUI access if needed:
+1. Open `~/ws/slam-go2w` in VS Code and reopen it in the devcontainer.
+2. On the Ubuntu host, allow local root access to the X server if needed:
    ```bash
-   xhost +local:root
+   xhost +si:localuser:root
    ```
-3. Inside the devcontainer, run:
+3. Inside the devcontainer, check which desktop network interface is `UP` on the same subnet as the robot:
    ```bash
-   bash scripts/dlio/live_rviz.sh --iface enp97s0
+   ip -br addr
+   ```
+4. Inside the devcontainer, run:
+   ```bash
+   bash scripts/dlio/live_rviz.sh --iface <desktop_interface>
    ```
 
-On this desktop PC, `ip -br addr` shows `enp97s0` is `UP` on `192.168.111.100/24`, so `enp97s0` is the correct interface to use here. `wlan0` is the robot-side name that often appears in the online SLAM setup, but the desktop can use a different interface name entirely even when it is on the same subnet. You can re-check with:
+Replace `<desktop_interface>` with the actual desktop-side interface name, for example `enp97s0`. The desktop interface name does not need to match the robot-side `wlan0`. Keep `ROS_DOMAIN_ID` matched between robot and desktop if you set one manually.
 
-```bash
-ip -br addr
-```
-
-If the network setup changes, use the interface that is `UP` on the same subnet as the robot, for example `192.168.111.x`. This devcontainer flow is intended for desktop visualization only; the robot-side online SLAM stack still uses `docker/robot/run.sh`.
+If the network setup changes, re-run `ip -br addr` and use the interface that is `UP` on the same subnet as the robot, for example `192.168.111.x`. Run `xhost +si:localuser:root` only for the current desktop session rather than putting it in `~/.bashrc`.
 
 ## Quick start: Record raw sensor data
 
@@ -153,14 +134,14 @@ Use this reconstruction flow for raw sensor bags such as `humble_ws/bags/raw_YYY
 
 2. Run GLIM on a raw bag:
    ```bash
-   bash scripts/glim/run_glim_offline.sh --bag /path/to/raw_bag
+   bash scripts/glim/run_glim_offline.sh --bag ~/ws/slam-go2w/humble_ws/bags/raw_YYYYMMDD_HHMMSS
    ```
 
    The command prints the output `results=` directory when it finishes.
 
 3. Visualize a specific run by passing that result directory path:
    ```bash
-   bash scripts/glim/visualize_glim_run.sh /path/to/output/results/<run_name>
+   bash scripts/glim/visualize_glim_run.sh ~/ws/slam-go2w/output/results/<run_name>
    ```
 
    `--latest` is still available as a convenience shortcut, but the standard flow is to visualize the exact run path you want.
