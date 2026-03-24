@@ -344,7 +344,7 @@ def analyze_trajectory_consistency(run_dir: Path, config_sensors: dict[str, Any]
 def collect_dlio_comparison(repo_path: Path) -> dict[str, Any]:
     params_path = repo_path / "humble_ws/src/direct_lidar_inertial_odometry/cfg/params.yaml"
     dlio_path = repo_path / "humble_ws/src/direct_lidar_inertial_odometry/cfg/dlio.yaml"
-    imu_cpp_path = repo_path / "humble_ws/src/go2_unitree_ros2/src/devel/imu_publisher.cpp"
+    imu_cpp_path = repo_path / "humble_ws/src/go2w-imu-publisher/src/imu_publisher.cpp"
     lowstate_path = repo_path / "humble_ws/src/unitree_ros2/cyclonedds_ws/src/unitree/unitree_go/msg/LowState.msg"
 
     params = extract_ros_parameters(params_path)

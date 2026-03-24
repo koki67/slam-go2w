@@ -9,7 +9,7 @@ windows:
   - commands:
       - source ${source}
       - source ${unitree_ros2}
-      - ros2 run go2_demo imu_publisher
+      - ros2 run go2w_imu_publisher imu_publisher
     name: imu_publisher
 
   - commands:
