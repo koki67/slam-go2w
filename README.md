@@ -4,6 +4,22 @@ Unified SLAM repository for the Unitree GO2-W robot with Hesai PandarXT-16 LiDAR
 
 Choose your SLAM algorithm — currently supports **D-LIO** (online + offline) and **GLIM** (offline), with an extensible layout for adding more.
 
+## Table of contents
+
+- [Repository layout](#repository-layout)
+- [Submodules](#submodules)
+- [Quick start: Online D-LIO (on robot)](#quick-start-online-d-lio-on-robot)
+  - [Desktop RViz over WiFi](#desktop-rviz-over-wifi)
+- [Quick start: Record D-LIO outputs (on robot)](#quick-start-record-d-lio-outputs-on-robot)
+- [Quick start: Record raw sensor data](#quick-start-record-raw-sensor-data)
+- [Quick start: Desktop replay of recorded D-LIO outputs](#quick-start-desktop-replay-of-recorded-d-lio-outputs)
+- [Quick start: Desktop offline D-LIO reconstruction](#quick-start-desktop-offline-d-lio-reconstruction)
+- [Quick start: Desktop offline GLIM processing](#quick-start-desktop-offline-glim-processing)
+- [Catmux sessions](#catmux-sessions)
+- [Sensor calibration](#sensor-calibration)
+- [Adding a new SLAM algorithm](#adding-a-new-slam-algorithm)
+- [License](#license)
+
 ## Repository layout
 
 ```
