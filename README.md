@@ -127,7 +127,7 @@ Use this workflow to replay a `dlio_YYYYMMDD__HHMMSS` bag recorded by `catmux/re
    bash scripts/dlio/playback.sh humble_ws/bags/dlio_YYYYMMDD__HHMMSS
    ```
 
-RViz2 opens automatically alongside the bag player. The bag loops continuously. Close the RViz2 window or press `Ctrl+C` to stop both.
+RViz2 opens automatically alongside the bag player. The bag plays once. Close the RViz2 window or press `Ctrl+C` to stop both.
 
 ## Quick start: Desktop offline D-LIO reconstruction
 
@@ -176,7 +176,7 @@ For example, to record D-LIO outputs:
 catmux_create_session /external/catmux/record_dlio.yaml
 ```
 If a catmux session is already running and you only want to reconnect to it, use `catmux attach`.
-For `catmux/playback_dlio.yaml`, playback stops after one pass by default; set `bag_play_args: --loop` if you want continuous replay.
+For `catmux/playback_dlio.yaml`, playback stops after one pass.
 
 ## Sensor calibration
 

@@ -8,14 +8,12 @@ parameters:
   # Set this to the bag directory you want to play back, e.g.:
   #   bag: /external/bags/dlio_20250301__143022
   bag: /external/bags/REPLACE_WITH_BAG_NAME
-  # Optional ros2 bag play args. Set to --loop to continuously replay.
-  bag_play_args: ""
 
 windows:
   - commands:
       - source ${source}
       - source ${unitree_ros2}
-      - "ros2 bag play ${bag} --clock ${bag_play_args}"
+      - "ros2 bag play ${bag} --clock"
     name: bag_play
 
   - commands:

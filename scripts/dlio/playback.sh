@@ -2,24 +2,23 @@
 # Play a recorded SLAM bag and open RViz2 in one command.
 #
 # Usage (from anywhere inside the workspace):
-#   bash scripts/dlio/playback.sh <bag_directory> [--loop] [ros2 bag play args...]
+#   bash scripts/dlio/playback.sh <bag_directory> [ros2 bag play args...]
 #
 # Examples:
 #   bash scripts/dlio/playback.sh humble_ws/bags/dlio_20250301__143022
 #   bash scripts/dlio/playback.sh humble_ws/bags/dlio_20250301__143022 --rate 2.0
-#   bash scripts/dlio/playback.sh humble_ws/bags/dlio_20250301__143022 --loop
 
 set -e
 
-BAG="${1:?Error: bag path required. Usage: $0 <bag_directory> [--loop] [ros2 bag play args...]}"
+BAG="${1:?Error: bag path required. Usage: $0 <bag_directory> [ros2 bag play args...]}"
 shift
-LOOP=false
 EXTRA_ARGS=()
 
 while [ $# -gt 0 ]; do
     case "$1" in
         --loop)
-            LOOP=true
+            echo "Error: --loop is not supported in this playback helper." >&2
+            exit 2
             ;;
         *)
             EXTRA_ARGS+=("$1")
@@ -39,14 +38,10 @@ fi
 
 echo "Bag:  $BAG"
 echo "RViz: $RVIZ_CFG"
-echo "Loop: $LOOP"
 echo ""
 
 # Start bag player in the background.
 PLAY_ARGS=(--clock)
-if [ "$LOOP" = true ]; then
-    PLAY_ARGS+=(--loop)
-fi
 PLAY_ARGS+=("${EXTRA_ARGS[@]}")
 ros2 bag play "$BAG" "${PLAY_ARGS[@]}" &
 BAG_PID=$!
