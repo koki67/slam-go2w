@@ -25,9 +25,9 @@ Choose your SLAM algorithm — currently supports **D-LIO** (online + offline) a
 ```
 slam-go2w/
 ├── humble_ws/src/                  ROS 2 Humble workspace
-│   ├── go2_unitree_ros2/           IMU republisher (submodule)
+│   ├── go2w-imu-publisher/          IMU republisher (submodule)
 │   ├── unitree_ros2/               Unitree DDS + messages (submodule)
-│   ├── go2w-hesai-lidar-driver/  Hesai XT16 driver (submodule)
+│   ├── go2w-hesai-lidar-driver/    Hesai XT16 driver (submodule)
 │   └── direct_lidar_inertial_odometry/  D-LIO algorithm (submodule)
 ├── docker/
 │   ├── robot/                      ARM64 robot Docker image
@@ -49,7 +49,7 @@ slam-go2w/
 
 | Package | Repository | Branch | Purpose |
 |---------|-----------|--------|---------|
-| go2_unitree_ros2 | koki67/go2_unitree_ros2 | imu_publisher | GO2-W IMU republisher |
+| go2w-imu-publisher | koki67/go2w-imu-publisher | main | GO2-W IMU republisher |
 | unitree_ros2 | koki67/unitree_ros2 | master | Unitree ROS2 bindings & DDS |
 | go2w-hesai-lidar-driver | koki67/go2w-hesai-lidar-driver | main | Hesai XT16 ROS2 driver |
 | direct_lidar_inertial_odometry | koki67/direct_lidar_inertial_odometry | feature/ros2 | D-LIO SLAM algorithm |
