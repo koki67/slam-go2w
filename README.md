@@ -65,7 +65,7 @@ The examples below assume this repository is cloned at `~/ws/slam-go2w`. Adjust 
 
 1. Build the robot Docker image:
    ```bash
-   docker build -f ~/ws/slam-go2w/docker/robot/Dockerfile -t go2w-humble:latest ~/ws/slam-go2w
+   docker build -f docker/robot/Dockerfile -t go2w-humble:latest .
    ```
 
 2. Start the container:
