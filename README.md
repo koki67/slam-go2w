@@ -157,6 +157,8 @@ Use this reconstruction flow for raw sensor bags such as `humble_ws/bags/raw_YYY
 
 ## Quick start: Desktop offline GLIM processing
 
+Run this section from a normal Ubuntu host shell, not from the devcontainer.
+
 1. Build the GLIM Docker image:
    ```bash
    bash scripts/glim/build_image.sh
