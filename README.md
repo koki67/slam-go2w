@@ -122,8 +122,8 @@ This session runs the same live robot-side stack as `online_dlio.yaml` and addit
 - `/tf`
 - `/tf_static`
 
-Bags are saved to `/external/bags/dlio_YYYYMMDD__HHMMSS`.
-Use this bag type with `bash scripts/dlio/playback.sh humble_ws/bags/dlio_YYYYMMDD__HHMMSS` for desktop replay.
+Bags are saved to `/external/bags/dlio_YYYYMMDD_HHMMSS`.
+Use this bag type with `bash scripts/dlio/playback.sh humble_ws/bags/dlio_YYYYMMDD_HHMMSS` for desktop replay.
 
 ## Quick start: Record raw sensor data
 
@@ -135,12 +135,12 @@ Bags are saved to `/external/bags/raw_YYYYMMDD_HHMMSS`.
 
 ## Quick start: Desktop replay of recorded D-LIO outputs
 
-Use this workflow to replay a `dlio_YYYYMMDD__HHMMSS` bag recorded by `catmux/record_dlio.yaml`. The wrapper script in this repository is `scripts/dlio/playback.sh`.
+Use this workflow to replay a `dlio_YYYYMMDD_HHMMSS` bag recorded by `catmux/record_dlio.yaml`. The wrapper script in this repository is `scripts/dlio/playback.sh`.
 
 1. Open this repository in VS Code and reopen it in the devcontainer
 2. Once the container is ready, open an integrated terminal and run:
    ```bash
-   bash scripts/dlio/playback.sh humble_ws/bags/dlio_YYYYMMDD__HHMMSS
+   bash scripts/dlio/playback.sh humble_ws/bags/dlio_YYYYMMDD_HHMMSS
    ```
 
 RViz2 opens automatically alongside the bag player. The bag plays once. Close the RViz2 window or press `Ctrl+C` to stop both.
@@ -153,7 +153,7 @@ RViz2 opens automatically alongside the bag player. The bag plays once. Close th
    bash scripts/dlio/reconstruct_raw.sh <bag_directory>
    ```
 
-Use this reconstruction flow for raw sensor bags such as `humble_ws/bags/raw_YYYYMMDD_HHMMSS`. Use `scripts/dlio/playback.sh` only for bags that already contain recorded D-LIO outputs such as `dlio_YYYYMMDD__HHMMSS`.
+Use this reconstruction flow for raw sensor bags such as `humble_ws/bags/raw_YYYYMMDD_HHMMSS`. Use `scripts/dlio/playback.sh` only for bags that already contain recorded D-LIO outputs such as `dlio_YYYYMMDD_HHMMSS`.
 
 ## Quick start: Desktop offline GLIM processing
 

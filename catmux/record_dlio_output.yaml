@@ -28,5 +28,5 @@ windows:
       - source ${source}
       - source ${unitree_ros2}
       - sleep 5
-      - "ros2 bag record -o /external/bags/dlio_$(date +%Y%m%d__%H%M%S) /dlio/odom_node/odom /dlio/odom_node/path /dlio/odom_node/keyframes /dlio/odom_node/pointcloud/deskewed /map /tf /tf_static"
+      - "ros2 bag record -o /external/bags/dlio_$(date +%Y%m%d_%H%M%S) /dlio/odom_node/odom /dlio/odom_node/path /dlio/odom_node/keyframes /dlio/odom_node/pointcloud/deskewed /map /tf /tf_static"
     name: bag_record

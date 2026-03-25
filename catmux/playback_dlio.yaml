@@ -6,7 +6,7 @@ parameters:
   unitree_ros2: /external/humble_ws/src/unitree_ros2/setup.sh
   rviz_cfg: direct_lidar_inertial_odometry/launch/dlio.rviz
   # Set this to the bag directory you want to play back, e.g.:
-  #   bag: /external/bags/dlio_20250301__143022
+  #   bag: /external/bags/dlio_20250301_143022
   bag: /external/bags/REPLACE_WITH_BAG_NAME
 
 windows:

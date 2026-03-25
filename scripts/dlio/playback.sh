@@ -5,8 +5,8 @@
 #   bash scripts/dlio/playback.sh <bag_directory> [ros2 bag play args...]
 #
 # Examples:
-#   bash scripts/dlio/playback.sh humble_ws/bags/dlio_20250301__143022
-#   bash scripts/dlio/playback.sh humble_ws/bags/dlio_20250301__143022 --rate 2.0
+#   bash scripts/dlio/playback.sh humble_ws/bags/dlio_20250301_143022
+#   bash scripts/dlio/playback.sh humble_ws/bags/dlio_20250301_143022 --rate 2.0
 
 set -e
 
