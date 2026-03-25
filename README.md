@@ -70,7 +70,7 @@ The examples below assume this repository is cloned at `~/ws/slam-go2w`. Adjust 
 
 2. Start the container:
    ```bash
-   bash ~/ws/slam-go2w/docker/robot/run.sh
+   bash docker/robot/run.sh
    ```
 
 3. Inside the container, build the workspace:
