@@ -16,7 +16,6 @@ Choose your SLAM algorithm — currently supports **D-LIO** (online + offline) a
 - [Quick start: Desktop offline D-LIO reconstruction](#quick-start-desktop-offline-d-lio-reconstruction)
 - [Quick start: Desktop offline GLIM processing](#quick-start-desktop-offline-glim-processing)
 - [Catmux sessions](#catmux-sessions)
-- [Sensor calibration](#sensor-calibration)
 - [Adding a new SLAM algorithm](#adding-a-new-slam-algorithm)
 - [License](#license)
 
@@ -44,6 +43,8 @@ slam-go2w/
 ├── tools/                          Bag validation and analysis tools
 └── output/                         Run artifacts (gitignored)
 ```
+
+`config/sensor/go2w_calibration.yaml` is the shared sensor calibration reference. Keep the algorithm-specific copies in D-LIO and GLIM configs aligned with it when calibration changes.
 
 ## Submodules
 
@@ -194,19 +195,6 @@ catmux_create_session /external/catmux/record_dlio.yaml
 ```
 If a catmux session is already running and you only want to reconnect to it, use `catmux attach`.
 For `catmux/playback_dlio.yaml`, playback stops after one pass.
-
-## Sensor calibration
-
-The shared calibration reference is at `config/sensor/go2w_calibration.yaml`.
-
-Key values:
-- **Extrinsic (base_link -> LiDAR)**: `[0.1634, 0.0, 0.116]`
-- **IMU topic**: `/go2w/imu` (frame: `imu_link`)
-- **LiDAR topic**: `/points_raw` (frame: `hesai_lidar`)
-- **LiDAR IP**: `192.168.123.20`
-
-Algorithm-specific configs contain their own copies in native formats.
-Verify consistency against this reference when updating calibration.
 
 ## Adding a new SLAM algorithm
 
