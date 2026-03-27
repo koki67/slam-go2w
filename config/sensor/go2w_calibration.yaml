@@ -22,10 +22,12 @@ topics:
   lidar: /points_raw
 
 # --- Extrinsic calibration: base_link -> LiDAR ---
-# Translation [x, y, z] in meters
+# The PandarXT-16 native frame is rotated +90 deg around Z from REP-103:
+#   LiDAR X = Robot Left, LiDAR Y = Robot Backward, LiDAR Z = Robot Up
+# Rz(+90) rotates LiDAR-frame vectors into base_link (REP-103).
 T_baselink_lidar:
   translation: [0.1634, 0.0, 0.116]
-  rotation_quaternion: [0.0, 0.0, 0.0, 1.0]  # [x, y, z, w] identity
+  rotation_quaternion: [0.0, 0.0, 0.7071068, 0.7071068]  # [x, y, z, w]
 
 # --- Extrinsic calibration: base_link -> IMU ---
 # The Go2W IMU body frame is rotated +90 deg around Z from the robot body:
@@ -49,6 +51,9 @@ lidar:
   port: 2368
 
 # --- GLIM-specific timing ---
+# GLIM consumes T_lidar_imu directly in config_sensors.json, so any extrinsic
+# update there should be validated with an offline run instead of copied blindly
+# from the D-LIO/body-frame representation.
 glim:
   imu_time_offset: -0.005  # evidence-based default from timing sweeps
   points_time_offset: 0.0
