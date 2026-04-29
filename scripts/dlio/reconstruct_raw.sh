@@ -106,6 +106,11 @@ if ! kill -0 "$DLIO_PID" 2>/dev/null; then
     wait "$DLIO_PID"
 fi
 
+# Reset D-LIO state before playback to clear any leftover data from previous runs
+echo "Resetting D-LIO node state..."
+ros2 service call /dlio_odom_node/reset_map direct_lidar_inertial_odometry/srv/ResetMap || true
+ros2 service call /dlio_map_node/reset_map direct_lidar_inertial_odometry/srv/ResetMap || true
+
 ros2 bag play "$BAG" --clock "${EXTRA_ARGS[@]}" &
 BAG_PID=$!
 
