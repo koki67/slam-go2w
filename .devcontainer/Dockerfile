@@ -9,6 +9,7 @@ RUN apt-get update && apt-get install -y \
     cmake \
     git \
     libeigen3-dev \
+    libgoogle-glog-dev \
     libomp-dev \
     libpcl-dev \
     python3-colcon-common-extensions \

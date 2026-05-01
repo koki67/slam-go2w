@@ -14,3 +14,7 @@
 	path = humble_ws/src/go2w-hesai-lidar-driver
 	url = https://github.com/koki67/go2w-hesai-lidar-driver.git
 	branch = main
+[submodule "humble_ws/src/fast_lio_ros2"]
+	path = humble_ws/src/fast_lio_ros2
+	url = https://github.com/koki67/FAST_LIO_ROS2.git
+	branch = feature/hesai-go2w
