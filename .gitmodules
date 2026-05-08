@@ -17,4 +17,4 @@
 [submodule "humble_ws/src/fast_lio_ros2"]
 	path = humble_ws/src/fast_lio_ros2
 	url = https://github.com/koki67/FAST_LIO_ROS2.git
-	branch = feature/hesai-go2w
+	branch = main
