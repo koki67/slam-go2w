@@ -27,8 +27,8 @@ windows:
 
   - commands:
       - source ${source}
-      - ros2 run tf2_ros static_transform_publisher 0 0 0 -1.5707963 0 0 body base_link
-    name: tf_body_baselink
+      - python3 /external/scripts/fastlio/odom_body_to_baselink.py
+    name: odom_corrector
 
   # - commands:
   #     - source ${source}
