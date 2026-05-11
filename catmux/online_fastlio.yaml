@@ -25,6 +25,11 @@ windows:
       - ros2 launch fast_lio mapping.launch.py config_file:=go2w.yaml pointcloud_topic:=points_raw imu_topic:=go2w/imu
     name: fastlio
 
+  - commands:
+      - source ${source}
+      - ros2 run tf2_ros static_transform_publisher 0 0 0 -1.5707963 0 0 body base_link
+    name: tf_body_baselink
+
   # - commands:
   #     - source ${source}
   #     - source ${unitree_ros2}
