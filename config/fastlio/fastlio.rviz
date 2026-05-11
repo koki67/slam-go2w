@@ -65,13 +65,13 @@ Visualization Manager:
           Value: false
         - Alpha: 1
           Class: rviz_default_plugins/Axes
-          Enabled: false
+          Enabled: true
           Length: 0.7
           Name: base_link
           Radius: 0.1
           Reference Frame: base_link
           Show Trail: false
-          Value: false
+          Value: true
       Enabled: true
       Name: Frames
     - Class: rviz_common/Group
@@ -187,7 +187,7 @@ Visualization Manager:
               Scale: 1
               Value: true
             Value: false
-          Enabled: true
+          Enabled: false
           Keep: 1
           Name: Pose
           Position Tolerance: 0.009999999776482582
