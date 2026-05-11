@@ -60,7 +60,7 @@ Visualization Manager:
           Length: 0.7
           Name: odom
           Radius: 0.1
-          Reference Frame: odom
+          Reference Frame: camera_init
           Show Trail: false
           Value: false
         - Alpha: 1
@@ -235,7 +235,7 @@ Visualization Manager:
   Global Options:
     Background Color: 0; 0; 0
     Default Light: true
-    Fixed Frame: odom
+    Fixed Frame: camera_init
     Frame Rate: 30
   Name: root
   Tools:
