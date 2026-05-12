@@ -6,6 +6,9 @@ humble_ws/log/
 # Desktop-only offline D-LIO build artifacts
 .devcontainer/offline_dlio/
 
+# Desktop-only offline FAST-LIO build artifacts
+.devcontainer/offline_fastlio/
+
 # Docker workspace artifacts
 docker/build/
 docker/install/
