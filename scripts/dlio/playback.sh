@@ -94,7 +94,7 @@ fi
 
 if ! command -v rviz2 >/dev/null 2>&1; then
     echo "Error: rviz2 not found in PATH after sourcing $ROS_SETUP" >&2
-    echo "This replay script must run in the desktop devcontainer based on ROS 2 Humble Desktop." >&2
+    echo "This script requires ROS 2 Humble Desktop (ros-humble-desktop). Ensure the correct ROS setup is sourced." >&2
     exit 1
 fi
 
