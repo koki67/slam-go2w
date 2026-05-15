@@ -2,7 +2,7 @@
 
 Unified SLAM repository for the Unitree GO2-W robot with Hesai PandarXT-16 LiDAR.
 
-Choose your SLAM algorithm — currently supports **D-LIO** (online + offline), **FAST-LIO** (online + offline), and **GLIM** (offline), with an extensible layout for adding more.
+Choose your SLAM algorithm — currently supports **D-LIO** (online + offline), **FAST-LIO** (online + offline), **LIO-SAM** (online + offline), and **GLIM** (offline), with an extensible layout for adding more.
 
 ## Table of contents
 
@@ -18,6 +18,10 @@ Choose your SLAM algorithm — currently supports **D-LIO** (online + offline), 
 - [Quick start: Record FAST-LIO outputs (on robot)](#quick-start-record-fast-lio-outputs-on-robot)
 - [Quick start: Desktop replay of recorded FAST-LIO outputs](#quick-start-desktop-replay-of-recorded-fast-lio-outputs)
 - [Quick start: Desktop offline FAST-LIO reconstruction](#quick-start-desktop-offline-fast-lio-reconstruction)
+- [Quick start: Online LIO-SAM (on robot)](#quick-start-online-lio-sam-on-robot)
+- [Quick start: Record LIO-SAM outputs (on robot)](#quick-start-record-lio-sam-outputs-on-robot)
+- [Quick start: Desktop replay of recorded LIO-SAM outputs](#quick-start-desktop-replay-of-recorded-lio-sam-outputs)
+- [Quick start: Desktop offline LIO-SAM reconstruction](#quick-start-desktop-offline-lio-sam-reconstruction)
 - [Quick start: Desktop offline GLIM processing](#quick-start-desktop-offline-glim-processing)
 - [Catmux sessions](#catmux-sessions)
 - [Adding a new SLAM algorithm](#adding-a-new-slam-algorithm)
@@ -32,20 +36,23 @@ slam-go2w/
 │   ├── unitree_ros2/               Unitree DDS + messages (submodule)
 │   ├── go2w-hesai-lidar-driver/    Hesai XT16 driver (submodule)
 │   ├── direct_lidar_inertial_odometry/  D-LIO algorithm (submodule)
-│   └── fast_lio_ros2/              FAST-LIO algorithm (submodule)
+│   ├── fast_lio_ros2/              FAST-LIO algorithm (submodule)
+│   └── lio_sam/                    LIO-SAM algorithm (submodule)
 ├── docker/
 │   ├── robot/                      ARM64 robot Docker image
 │   └── desktop/glim/               Desktop GLIM offline wrapper
-├── .devcontainer/                  Desktop D-LIO + FAST-LIO devcontainer
+├── .devcontainer/                  Desktop D-LIO + FAST-LIO + LIO-SAM devcontainer
 ├── catmux/                         Robot-side terminal sessions
 ├── config/
 │   ├── sensor/                     Shared calibration reference
 │   ├── dlio/                       D-LIO-specific configs
 │   ├── fastlio/                    FAST-LIO-specific configs
+│   ├── liosam/                     LIO-SAM-specific configs
 │   └── glim/offline/               GLIM override configs + experiments
 ├── scripts/
 │   ├── dlio/                       D-LIO offline scripts
 │   ├── fastlio/                    FAST-LIO offline scripts
+│   ├── liosam/                     LIO-SAM offline scripts
 │   └── glim/                       GLIM offline pipeline scripts
 ├── tools/                          Bag validation and analysis tools
 └── output/                         Run artifacts (gitignored)
@@ -62,6 +69,7 @@ slam-go2w/
 | go2w-hesai-lidar-driver | koki67/go2w-hesai-lidar-driver | main | Hesai XT16 ROS2 driver |
 | direct_lidar_inertial_odometry | koki67/direct_lidar_inertial_odometry | feature/ros2 | D-LIO SLAM algorithm |
 | fast_lio_ros2 | koki67/FAST_LIO_ROS2 | feature/hesai-go2w | FAST-LIO SLAM algorithm (Hesai-aware fork of Ericsii/FAST_LIO_ROS2) |
+| lio_sam | TixiaoShan/LIO-SAM | ros2 | LIO-SAM SLAM algorithm with GTSAM loop closure |
 
 Clone with submodules:
 ```bash
@@ -219,6 +227,60 @@ RViz2 opens automatically alongside the bag player. The bag plays once. Close th
 
 Use this reconstruction flow for raw sensor bags such as `humble_ws/bags/raw_YYYYMMDD_HHMMSS`. Use `scripts/fastlio/playback.sh` only for bags that already contain recorded FAST-LIO outputs such as `fastlio_YYYYMMDD_HHMMSS`.
 
+## Quick start: Online LIO-SAM (on robot)
+
+Same robot-side flow as D-LIO, just a different SLAM algorithm. Build the workspace as in the D-LIO quick start, then:
+
+```bash
+catmux_create_session /external/catmux/online_liosam.yaml
+```
+
+This session starts the GO2-W IMU publisher, the Hesai driver, a small `/points_raw` to `/points_velodyne` relay, and LIO-SAM. To visualize live LIO-SAM output on the desktop over WiFi, run inside the devcontainer:
+
+```bash
+bash scripts/liosam/live_rviz.sh --iface enp97s0
+```
+
+## Quick start: Record LIO-SAM outputs (on robot)
+
+Use this workflow when you want a compact replay bag that contains the online LIO-SAM outputs:
+```bash
+catmux_create_session /external/catmux/record_liosam.yaml
+```
+
+This session runs the same live robot-side stack as `online_liosam.yaml` and additionally records these topics for replay and visualization:
+- `/lio_sam/mapping/odometry`
+- `/lio_sam/mapping/path`
+- `/lio_sam/mapping/cloud_registered`
+- `/lio_sam/mapping/map_global`
+- `/tf`
+- `/tf_static`
+
+Bags are saved to `/external/bags/liosam_YYYYMMDD_HHMMSS`.
+Use this bag type with `bash scripts/liosam/playback.sh humble_ws/bags/liosam_YYYYMMDD_HHMMSS` for desktop replay.
+
+## Quick start: Desktop replay of recorded LIO-SAM outputs
+
+Use this workflow to replay a `liosam_YYYYMMDD_HHMMSS` bag recorded by `catmux/record_liosam.yaml`. The wrapper script in this repository is `scripts/liosam/playback.sh`.
+
+1. Open this repository in VS Code and reopen it in the devcontainer.
+2. Once the container is ready, open an integrated terminal and run:
+   ```bash
+   bash scripts/liosam/playback.sh humble_ws/bags/liosam_YYYYMMDD_HHMMSS
+   ```
+
+RViz2 opens automatically alongside the bag player. The bag plays once. Close the RViz2 window or press `Ctrl+C` to stop both.
+
+## Quick start: Desktop offline LIO-SAM reconstruction
+
+1. Open this repository in VS Code and reopen it in the devcontainer.
+2. Once the container is ready, run reconstruction:
+   ```bash
+   bash scripts/liosam/reconstruct_raw.sh <bag_directory>
+   ```
+
+Use this reconstruction flow for raw sensor bags such as `humble_ws/bags/raw_YYYYMMDD_HHMMSS`. Use `scripts/liosam/playback.sh` only for bags that already contain recorded LIO-SAM outputs such as `liosam_YYYYMMDD_HHMMSS`.
+
 ## Quick start: Desktop offline GLIM processing
 
 Run this section from a normal Ubuntu host shell, not from the devcontainer.
@@ -253,6 +315,10 @@ Run this section from a normal Ubuntu host shell, not from the devcontainer.
 | FAST-LIO online | `catmux/online_fastlio.yaml` | Online FAST-LIO (sensors + SLAM) |
 | FAST-LIO record | `catmux/record_fastlio.yaml` | Record FAST-LIO SLAM outputs |
 | FAST-LIO playback | `catmux/playback_fastlio.yaml` | Replay recorded FAST-LIO outputs |
+| LIO-SAM online | `catmux/online_liosam.yaml` | Online LIO-SAM (sensors + relay + SLAM) |
+| LIO-SAM record | `catmux/record_liosam.yaml` | Record LIO-SAM SLAM outputs |
+| LIO-SAM playback | `catmux/playback_liosam.yaml` | Replay recorded LIO-SAM outputs |
+| LIO-SAM reconstruct raw | `catmux/reconstruct_raw_liosam.yaml` | Reconstruct LIO-SAM outputs from raw bags |
 
 Create any of these tmux sessions with `catmux_create_session /external/<path-to-yaml>`.
 For example, to record D-LIO outputs:

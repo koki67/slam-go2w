@@ -9,6 +9,9 @@ DESKTOP_INSTALL="$DESKTOP_WS_ROOT/install"
 FASTLIO_SRC="$REPO_ROOT/humble_ws/src/fast_lio_ros2"
 DESKTOP_FASTLIO_WS_ROOT="$REPO_ROOT/.devcontainer/offline_fastlio"
 DESKTOP_FASTLIO_INSTALL="$DESKTOP_FASTLIO_WS_ROOT/install"
+LIOSAM_SRC="$REPO_ROOT/humble_ws/src/lio_sam"
+DESKTOP_LIOSAM_WS_ROOT="$REPO_ROOT/.devcontainer/offline_liosam"
+DESKTOP_LIOSAM_INSTALL="$DESKTOP_LIOSAM_WS_ROOT/install"
 
 if [ ! -f "$ROS_SETUP" ]; then
     echo "Error: ROS 2 setup not found: $ROS_SETUP" >&2
@@ -62,5 +65,27 @@ if [ -d "$FASTLIO_SRC" ]; then
     echo "Installed setup: $DESKTOP_FASTLIO_INSTALL/setup.bash"
 else
     echo "Skipping FAST-LIO build: submodule not present at $FASTLIO_SRC."
+    echo "  Run 'git submodule update --init --recursive' once the submodule is added, then rerun this script."
+fi
+
+# LIO-SAM is optional: build only when the submodule has been pulled in.
+if [ -d "$LIOSAM_SRC" ]; then
+    mkdir -p "$DESKTOP_LIOSAM_WS_ROOT"
+    rm -rf "$DESKTOP_LIOSAM_WS_ROOT/build" "$DESKTOP_LIOSAM_INSTALL" "$DESKTOP_LIOSAM_WS_ROOT/log"
+
+    colcon --log-base "$DESKTOP_LIOSAM_WS_ROOT/log" build \
+        --symlink-install \
+        --base-paths "$LIOSAM_SRC" \
+        --build-base "$DESKTOP_LIOSAM_WS_ROOT/build" \
+        --install-base "$DESKTOP_LIOSAM_INSTALL" \
+        --packages-select lio_sam
+
+    grep -qxF "source $DESKTOP_LIOSAM_INSTALL/setup.bash" ~/.bashrc || \
+        echo "source $DESKTOP_LIOSAM_INSTALL/setup.bash" >> ~/.bashrc
+
+    echo "Desktop offline LIO-SAM environment is ready."
+    echo "Installed setup: $DESKTOP_LIOSAM_INSTALL/setup.bash"
+else
+    echo "Skipping LIO-SAM build: submodule not present at $LIOSAM_SRC."
     echo "  Run 'git submodule update --init --recursive' once the submodule is added, then rerun this script."
 fi

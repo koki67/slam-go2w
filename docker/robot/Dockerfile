@@ -60,10 +60,19 @@ RUN add-apt-repository ppa:borglab/gtsam-release-4.1 && \
 
 RUN apt-get update -q && \
     apt-get install -y \
+    libeigen3-dev \
+    libopencv-dev \
+    libpcl-dev \
     ros-humble-rosidl-generator-dds-idl \
     ros-humble-rmw-cyclonedds-cpp \
+    ros-humble-pcl-msgs \
+    ros-humble-perception-pcl \
     ros-humble-pcl-conversions \
-    ros-humble-pcl-ros
+    ros-humble-pcl-ros \
+    ros-humble-tf2-eigen \
+    ros-humble-tf2-sensor-msgs \
+    ros-humble-vision-opencv \
+    ros-humble-xacro
 
 RUN git clone https://github.com/Livox-SDK/Livox-SDK2.git && \
     cd ./Livox-SDK2 && \

@@ -1,0 +1,31 @@
+common:
+  default_window: liosam
+
+parameters:
+  source: /external/humble_ws/install/setup.bash
+  unitree_ros2: /external/humble_ws/src/unitree_ros2/setup.sh
+  params_file: /external/config/liosam/go2w.yaml
+
+windows:
+  - commands:
+      - source ${source}
+      - source ${unitree_ros2}
+      - ros2 run go2w_imu_publisher imu_publisher
+    name: imu_publisher
+
+  - commands:
+      - source ${source}
+      - source ${unitree_ros2}
+      - ros2 launch hesai_lidar hesai_lidar_launch.py
+    name: hesai_lidar_node
+
+  - commands:
+      - source ${source}
+      - python3 /external/scripts/liosam/hesai_to_velodyne.py
+    name: hesai_to_velodyne
+
+  - commands:
+      - source ${source}
+      - source ${unitree_ros2}
+      - "trap 'kill 0' EXIT; ros2 run tf2_ros static_transform_publisher 0 0 0 0 0 0 1 map odom & ros2 run tf2_ros static_transform_publisher 0.1634 0 0.116 0 0 0.7071068 0.7071068 base_link hesai_lidar & ros2 run lio_sam lio_sam_imuPreintegration --ros-args --params-file ${params_file} & ros2 run lio_sam lio_sam_imageProjection --ros-args --params-file ${params_file} & ros2 run lio_sam lio_sam_featureExtraction --ros-args --params-file ${params_file} & ros2 run lio_sam lio_sam_mapOptimization --ros-args --params-file ${params_file} & wait"
+    name: liosam
