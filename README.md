@@ -8,6 +8,7 @@ Choose your SLAM algorithm — currently supports **D-LIO** (online + offline), 
 
 - [Repository layout](#repository-layout)
 - [Submodules](#submodules)
+- [Setup](#setup)
 - [Quick start: Online D-LIO (on robot)](#quick-start-online-d-lio-on-robot)
   - [Desktop RViz over WiFi](#desktop-rviz-over-wifi)
 - [Quick start: Record D-LIO outputs (on robot)](#quick-start-record-d-lio-outputs-on-robot)
@@ -70,7 +71,7 @@ git clone --recurse-submodules https://github.com/koki67/slam-go2w.git
 
 The examples below assume this repository is cloned at `~/ws/slam-go2w`. Adjust the path if your workspace lives elsewhere.
 
-## Quick start: Online D-LIO (on robot)
+## Setup
 
 1. Build the robot Docker image:
    ```bash
@@ -90,7 +91,11 @@ The examples below assume this repository is cloned at `~/ws/slam-go2w`. Adjust 
    source install/setup.bash
    ```
 
-4. Create and attach the online D-LIO tmux session:
+## Quick start: Online D-LIO (on robot)
+
+Complete the [Setup](#setup) steps first, then:
+
+1. Create and attach the online D-LIO tmux session:
    ```bash
    catmux_create_session /external/catmux/online_dlio.yaml
    ```
@@ -166,7 +171,7 @@ Use this reconstruction flow for raw sensor bags such as `humble_ws/bags/raw_YYY
 
 ## Quick start: Online FAST-LIO (on robot)
 
-Same robot-side flow as D-LIO, just a different SLAM algorithm. Build the workspace as in the D-LIO quick start, then:
+Complete the [Setup](#setup) steps first, then:
 
 ```bash
 catmux_create_session /external/catmux/online_fastlio.yaml
