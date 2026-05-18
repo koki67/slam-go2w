@@ -9,7 +9,7 @@
 [submodule "humble_ws/src/go2w-imu-publisher"]
 	path = humble_ws/src/go2w-imu-publisher
 	url = https://github.com/koki67/go2w-imu-publisher.git
-	branch = main
+	branch = fix/monotonic-imu-stamps-liosam
 [submodule "humble_ws/src/go2w-hesai-lidar-driver"]
 	path = humble_ws/src/go2w-hesai-lidar-driver
 	url = https://github.com/koki67/go2w-hesai-lidar-driver.git
@@ -20,5 +20,5 @@
 	branch = main
 [submodule "humble_ws/src/lio_sam"]
 	path = humble_ws/src/lio_sam
-	url = https://github.com/TixiaoShan/LIO-SAM.git
-	branch = ros2
+	url = https://github.com/koki67/LIO-SAM.git
+	branch = fix/lio-sam-imu-timestamp-guards
