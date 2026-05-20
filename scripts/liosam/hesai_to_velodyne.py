@@ -7,6 +7,7 @@ from rclpy.node import Node
 from rclpy.qos import qos_profile_sensor_data
 from sensor_msgs.msg import PointCloud2, PointField
 from sensor_msgs_py import point_cloud2
+from std_msgs.msg import Header
 
 
 VELODYNE_FIELDS = [
@@ -63,7 +64,21 @@ class HesaiToVelodyne(Node):
                 )
             )
 
-        self.pub.publish(point_cloud2.create_cloud(msg.header, VELODYNE_FIELDS, converted))
+        # LIO-SAM's imageProjection treats header.stamp as the scan-start absolute time
+        # (timeScanCur), and per-point `time` as the offset from it. Re-anchor header.stamp
+        # to the earliest point's firing time so header.stamp + point.time = absolute capture
+        # time. Without this, IMU deskew is offset by the Hesai driver's header convention.
+        sec = int(min_timestamp)
+        nanosec = int(round((min_timestamp - sec) * 1e9))
+        if nanosec >= 1_000_000_000:
+            sec += 1
+            nanosec -= 1_000_000_000
+        out_header = Header()
+        out_header.frame_id = msg.header.frame_id
+        out_header.stamp.sec = sec
+        out_header.stamp.nanosec = nanosec
+
+        self.pub.publish(point_cloud2.create_cloud(out_header, VELODYNE_FIELDS, converted))
 
 
 def main():
