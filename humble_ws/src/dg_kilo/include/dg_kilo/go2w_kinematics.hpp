@@ -45,7 +45,8 @@ public:
   // Hip x-axis sign (left legs +1, right legs -1) for the abduction joint
   static const std::array<double, kNumLegs> kHipYSign;
 
-  explicit Go2wKinematics(const LinkLengths & lengths = LinkLengths{});
+  Go2wKinematics();
+  explicit Go2wKinematics(const LinkLengths & lengths);
 
   // Full FK for one leg (joint angles in radians).
   LegFkResult legFk(int leg_idx, const LegJoints & q) const;

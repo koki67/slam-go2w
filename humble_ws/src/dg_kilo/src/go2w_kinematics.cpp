@@ -14,6 +14,9 @@ const std::array<Eigen::Vector3d, Go2wKinematics::kNumLegs> Go2wKinematics::kHip
 // +1 for left legs (abduction moves foot outward toward +y), -1 for right
 const std::array<double, Go2wKinematics::kNumLegs> Go2wKinematics::kHipYSign = {{1, -1, 1, -1}};
 
+Go2wKinematics::Go2wKinematics()
+: Go2wKinematics(LinkLengths{}) {}
+
 Go2wKinematics::Go2wKinematics(const LinkLengths & lengths)
 : lengths_(lengths) {}
 

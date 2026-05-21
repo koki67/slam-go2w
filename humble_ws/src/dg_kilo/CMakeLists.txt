@@ -126,8 +126,8 @@ if(BUILD_TESTING)
   target_link_libraries(test_degradation Eigen3::Eigen gtsam)
 
   ament_add_gtest(test_leg_eskf test/test_leg_eskf.cpp src/leg_eskf.cpp src/go2w_kinematics.cpp)
-  target_include_directories(test_leg_eskf PRIVATE include ${EIGEN3_INCLUDE_DIR})
-  target_link_libraries(test_leg_eskf Eigen3::Eigen)
+  target_include_directories(test_leg_eskf PRIVATE include ${EIGEN3_INCLUDE_DIR} ${PCL_INCLUDE_DIRS})
+  target_link_libraries(test_leg_eskf Eigen3::Eigen ${PCL_LIBRARIES})
 endif()
 
 # ---- Install ----
