@@ -105,7 +105,16 @@ WheelContactVelocity Go2wKinematics::contactVelocity(
 
   // Add wheel spin contribution: r·ω_wheel along the rolling tangent
   // The tangent direction perpendicular to t_rolling in the vertical plane
-  Eigen::Vector3d t_tangent = Eigen::Vector3d(0,0,1).cross(t_rolling_base).normalized();
+  Eigen::Vector3d t_tangent = Eigen::Vector3d::UnitZ().cross(t_rolling_base);
+  if (t_tangent.norm() < 1e-9) {
+    t_tangent = Eigen::Vector3d::UnitX().cross(t_rolling_base);
+  }
+  const double tangent_norm = t_tangent.norm();
+  if (tangent_norm > 1e-9) {
+    t_tangent /= tangent_norm;
+  } else {
+    t_tangent.setZero();
+  }
   Eigen::Vector3d v_roll = lengths_.wheel_r * omega_wheel * t_tangent;
 
   WheelContactVelocity wc;

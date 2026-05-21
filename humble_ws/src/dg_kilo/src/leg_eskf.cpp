@@ -75,9 +75,18 @@ void LegEskf::updateWheelContact(
     Eigen::Vector3d t_roll = wc.t_rolling;
 
     // Two perpendicular axes
-    Eigen::Vector3d t1 = t_roll.cross(Eigen::Vector3d(0,0,1)).normalized();
-    if (t1.norm() < 0.1) t1 = t_roll.cross(Eigen::Vector3d(1,0,0)).normalized();
-    Eigen::Vector3d t2 = t_roll.cross(t1).normalized();
+    Eigen::Vector3d t1 = t_roll.cross(Eigen::Vector3d::UnitZ());
+    if (t1.norm() < 1e-9) {
+      t1 = t_roll.cross(Eigen::Vector3d::UnitX());
+    }
+    const double t1_norm = t1.norm();
+    if (t1_norm < 1e-9) continue;
+    t1 /= t1_norm;
+
+    Eigen::Vector3d t2 = t_roll.cross(t1);
+    const double t2_norm = t2.norm();
+    if (t2_norm < 1e-9) continue;
+    t2 /= t2_norm;
 
     // Residual: expected 0 velocity along t1, t2
     Eigen::Vector2d r_wheel;

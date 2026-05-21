@@ -8,12 +8,23 @@ IkdTreeWrapper::IkdTreeWrapper()
 
 void IkdTreeWrapper::addPoints(const CloudPtr & cloud, bool /*downsample*/)
 {
+  if (!cloud || cloud->empty()) return;
+
   KD_TREE<PointXYZI>::PointVector pts(cloud->points.begin(), cloud->points.end());
+  if (pts.empty()) return;
+
+  if (tree_.size() == 0) {
+    tree_.Build(pts);
+    return;
+  }
+
   tree_.Add_Points(pts, true);
 }
 
 void IkdTreeWrapper::boxDelete(const Eigen::Vector3d & lo, const Eigen::Vector3d & hi)
 {
+  if (tree_.size() == 0) return;
+
   BoxPointType box;
   box.vertex_min[0] = static_cast<float>(lo.x());
   box.vertex_min[1] = static_cast<float>(lo.y());
@@ -31,6 +42,10 @@ int IkdTreeWrapper::nearestKSearch(
   std::vector<PointXYZI> & pts,
   std::vector<float> & dists)
 {
+  pts.clear();
+  dists.clear();
+  if (k <= 0 || tree_.size() == 0) return 0;
+
   KD_TREE<PointXYZI>::PointVector result;
   std::vector<float> dist_result;
   tree_.Nearest_Search(
@@ -45,6 +60,9 @@ int IkdTreeWrapper::radiusSearch(
   float radius,
   std::vector<PointXYZI> & pts)
 {
+  pts.clear();
+  if (radius <= 0.0f || tree_.size() == 0) return 0;
+
   KD_TREE<PointXYZI>::PointVector result;
   std::vector<float> dists;
   tree_.Nearest_Search(
