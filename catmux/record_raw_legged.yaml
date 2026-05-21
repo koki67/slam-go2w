@@ -1,0 +1,33 @@
+common:
+  default_window: bag_record
+
+parameters:
+  source: /external/humble_ws/install/setup.bash
+  unitree_ros2: /external/humble_ws/src/unitree_ros2/setup.sh
+
+# NOTE: This config extends record_raw.yaml to also capture /lowstate,
+# which is required by DG-KILO's leg ESKF and forward kinematics.
+# Existing raw bags captured with record_raw.yaml (no /lowstate) cannot be
+# used for DG-KILO reconstruction — record a new bag with this config.
+
+windows:
+  - commands:
+      - source ${source}
+      - source ${unitree_ros2}
+      - ros2 run go2w_imu_publisher imu_publisher
+    name: imu_publisher
+
+  - commands:
+      - source ${source}
+      - source ${unitree_ros2}
+      - ros2 launch hesai_lidar hesai_lidar_launch.py
+    name: hesai_lidar_node
+
+  # Raw sensor + lowstate recording for offline DG-KILO processing.
+  # Topics: /go2w/imu + /points_raw + /lowstate (joint encoders, IMU, foot contacts)
+  - commands:
+      - source ${source}
+      - source ${unitree_ros2}
+      - sleep 5
+      - "ros2 bag record -o /external/bags/raw_legged_$(date +%Y%m%d_%H%M%S) /go2w/imu /points_raw /lowstate"
+    name: bag_record

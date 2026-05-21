@@ -9,6 +9,9 @@ DESKTOP_INSTALL="$DESKTOP_WS_ROOT/install"
 FASTLIO_SRC="$REPO_ROOT/humble_ws/src/fast_lio_ros2"
 DESKTOP_FASTLIO_WS_ROOT="$REPO_ROOT/.devcontainer/offline_fastlio"
 DESKTOP_FASTLIO_INSTALL="$DESKTOP_FASTLIO_WS_ROOT/install"
+DGKILO_SRC="$REPO_ROOT/humble_ws/src/dg_kilo"
+DESKTOP_DGKILO_WS_ROOT="$REPO_ROOT/.devcontainer/offline_dgkilo"
+DESKTOP_DGKILO_INSTALL="$DESKTOP_DGKILO_WS_ROOT/install"
 
 if [ ! -f "$ROS_SETUP" ]; then
     echo "Error: ROS 2 setup not found: $ROS_SETUP" >&2
@@ -63,4 +66,26 @@ if [ -d "$FASTLIO_SRC" ]; then
 else
     echo "Skipping FAST-LIO build: submodule not present at $FASTLIO_SRC."
     echo "  Run 'git submodule update --init --recursive' once the submodule is added, then rerun this script."
+fi
+
+# DG-KILO is optional: build only when the source directory is present.
+# Requires libgtsam-dev (added to Dockerfile) — disk budget: +~300 MB.
+if [ -d "$DGKILO_SRC" ]; then
+    mkdir -p "$DESKTOP_DGKILO_WS_ROOT"
+    rm -rf "$DESKTOP_DGKILO_WS_ROOT/build" "$DESKTOP_DGKILO_INSTALL" "$DESKTOP_DGKILO_WS_ROOT/log"
+
+    colcon --log-base "$DESKTOP_DGKILO_WS_ROOT/log" build \
+        --symlink-install \
+        --base-paths "$REPO_ROOT/humble_ws/src" \
+        --build-base "$DESKTOP_DGKILO_WS_ROOT/build" \
+        --install-base "$DESKTOP_DGKILO_INSTALL" \
+        --packages-select dg_kilo
+
+    grep -qxF "source $DESKTOP_DGKILO_INSTALL/setup.bash" ~/.bashrc || \
+        echo "source $DESKTOP_DGKILO_INSTALL/setup.bash" >> ~/.bashrc
+
+    echo "Desktop offline DG-KILO environment is ready."
+    echo "Installed setup: $DESKTOP_DGKILO_INSTALL/setup.bash"
+else
+    echo "Skipping DG-KILO build: source not present at $DGKILO_SRC."
 fi
