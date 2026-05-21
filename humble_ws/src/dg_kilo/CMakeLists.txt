@@ -28,7 +28,7 @@ find_package(pcl_conversions REQUIRED)
 find_package(rosidl_default_generators REQUIRED)
 find_package(unitree_go REQUIRED)
 find_package(Eigen3 REQUIRED)
-find_package(PCL REQUIRED COMPONENTS common io kdtree)
+find_package(PCL REQUIRED COMPONENTS common io kdtree registration)
 find_package(GTSAM REQUIRED)
 
 set(dependencies
@@ -66,8 +66,13 @@ target_include_directories(dg_kilo_ikd PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
   $<INSTALL_INTERFACE:include>
   ${EIGEN3_INCLUDE_DIR}
+  ${PCL_INCLUDE_DIRS}
 )
 target_compile_options(dg_kilo_ikd PRIVATE -O3)
+target_link_libraries(dg_kilo_ikd PUBLIC
+  ${PCL_LIBRARIES}
+  Eigen3::Eigen
+)
 
 # ---- Main executable sources (added incrementally per commit) ----
 set(DG_KILO_SRCS
