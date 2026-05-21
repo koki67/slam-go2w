@@ -1,0 +1,111 @@
+###############################################################################
+# DG-KILO configuration for the Unitree Go2W
+#
+# This file is the SINGLE SOURCE OF TRUTH for DG-KILO parameters.
+# Extrinsic values must stay aligned with:
+#   config/sensor/go2w_calibration.yaml
+#
+# Robot:  Unitree Go2W
+# LiDAR:  Hesai PandarXT-16
+# IMU:    Unitree built-in IMU (from lowstate)
+###############################################################################
+
+/**:
+  ros__parameters:
+    # --- Topics / frames (matches go2w_calibration.yaml) ---
+    pointcloud_topic: /points_raw
+    imu_topic:        /go2w/imu
+    lowstate_topic:   lowstate
+
+    map_frame:   map
+    odom_frame:  odom
+    base_frame:  base_link
+    lidar_frame: hesai_lidar
+    imu_frame:   imu_link
+
+    # --- Extrinsics: base_link → LiDAR (from go2w_calibration.yaml T_baselink_lidar) ---
+    # Rz(+90): LiDAR X = Robot Left, LiDAR Y = Robot Backward
+    extrinsic_lidar_translation: [0.1634, 0.0, 0.116]
+    extrinsic_lidar_quaternion:  [0.0, 0.0, 0.7071068, 0.7071068]  # [x,y,z,w]
+
+    # --- Extrinsics: base_link → IMU (from go2w_calibration.yaml T_baselink_imu) ---
+    extrinsic_imu_translation: [0.0, 0.0, 0.0]
+    extrinsic_imu_quaternion:  [0.0, 0.0, 0.7071068, 0.7071068]  # [x,y,z,w]
+
+    # --- LiDAR / slicing ---
+    lidar_n_scan: 16        # PandarXT-16 scan lines
+    lidar_rate_hz: 10.0
+    lidar_fov_deg: 360.0
+    lidar_min_range: 0.5
+    lidar_max_range: 100.0
+
+    # Adaptive slicing thresholds (Eq 2-3)
+    # n_slices scales linearly from slice_min_segments (at rest)
+    # to slice_max_segments (at slice_v_max or slice_omega_max).
+    slice_omega_max: 2.0     # rad/s → max segmentation
+    slice_v_max: 1.5          # m/s  → max segmentation
+    slice_min_segments: 1
+    slice_max_segments: 4
+
+    # --- IMU noises (from go2w_calibration.yaml imu_noise) ---
+    imu_acc_noise: 0.05
+    imu_gyr_noise: 0.02
+    imu_acc_bias:  1.0e-5
+    imu_gyr_bias:  1.0e-5
+    gravity: 9.80511
+
+    # --- Feature extraction ---
+    edge_threshold:   1.0    # LOAM smoothness c_j above this → edge
+    planar_threshold: 0.1    # LOAM smoothness c_j below this → planar
+    downsample_leaf:  0.2    # voxel filter leaf size [m]
+
+    # --- Intensity-gradient features (Eq 7-9) ---
+    intensity_gradient_min: 5.0
+    intensity_gradient_max: 200.0
+    intensity_only_when_degraded: true   # gate by DegradationStatus.degraded
+
+    # --- Degradation detection (Alg 1, Eq 13-15) ---
+    degradation_window: 30               # rolling window of minimum eigenvalues
+    degradation_alpha:  2.5              # τ = μ − α·σ
+    degradation_dir_consistency_deg: 10.0  # eigenvector angle consistency check
+
+    # --- Wheels / legs ---
+    # wheel_radius: pin to 0.0513 m from URDF ORIGIN.md after verifying mesh geometry.
+    # Verify motor_index_wheels against a live lowstate bag before use.
+    wheel_radius: 0.0513
+
+    foot_links:     [FL_foot, FR_foot, RL_foot, RR_foot]
+    wheel_joints:   [FL_foot_joint, FR_foot_joint, RL_foot_joint, RR_foot_joint]
+    motor_index_legs:   [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]
+    motor_index_wheels: [12, 13, 14, 15]
+
+    # --- Leg ESKF ---
+    # foot_force_threshold: calibrate using a static-stance + swing recording.
+    # Record /lowstate at rest on flat ground → histogram foot_force_est[i];
+    # typical stance value ~120–200 N·equivalent, swing ~10–30. Default 80 is
+    # a conservative midpoint — tune lower if stances are missed.
+    foot_force_threshold:      80.0
+    leg_eskf_position_noise:   0.01   # [m/√Hz]
+    leg_eskf_velocity_noise:   0.1    # [m/s/√Hz]
+    leg_eskf_foot_noise:       0.05
+    leg_eskf_wheel_slip_noise: 0.5    # high noise on rolling axis (unconstrained)
+
+    # --- Ground constraints ---
+    ground_search_radius:    0.25  # [m] radius for ikd-Tree NN per stance foot
+    ground_min_neighbors:    5     # minimum NN points for PCA plane fit
+    ground_max_angle_deg:    8.0   # coplanar gate: ignore r_g if angle > this
+    height_residual_sigma:   0.02  # [m]
+    coplanar_residual_sigma: 0.02  # [rad]
+
+    # --- Factor graph (iSAM2) ---
+    keyframe_distance:            0.3   # [m]  minimum translation for new keyframe
+    keyframe_angle_deg:          10.0   # [°]  minimum rotation for new keyframe
+    isam2_relinearize_threshold:  0.1
+    isam2_relinearize_skip:       1
+
+    # --- Loop closure ---
+    loop_enabled:       true
+    loop_search_radius: 15.0   # [m]
+    loop_time_gap:      30.0   # [s]  minimum time between query and candidate
+    loop_icp_fit_score: 0.3    # GICP fitness score threshold (lower = stricter)
+    loop_history_size:  25     # skip the most recent N keyframes in search

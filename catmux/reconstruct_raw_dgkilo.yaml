@@ -1,0 +1,12 @@
+common:
+  default_window: reconstruct
+
+parameters:
+  # Set this to a raw_legged_* bag directory (captured with record_raw_legged.yaml).
+  # Plain raw_* bags (no /lowstate) will be rejected by reconstruct_raw.sh.
+  bag: /external/bags/REPLACE_WITH_RAW_LEGGED_BAG_NAME
+
+windows:
+  - commands:
+      - "bash /external/scripts/dgkilo/reconstruct_raw.sh ${bag}"
+    name: reconstruct

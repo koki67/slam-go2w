@@ -2,7 +2,7 @@
 
 Unified SLAM repository for the Unitree GO2-W robot with Hesai PandarXT-16 LiDAR.
 
-Choose your SLAM algorithm — currently supports **D-LIO** (online + offline), **FAST-LIO** (online + offline), and **GLIM** (offline), with an extensible layout for adding more.
+Choose your SLAM algorithm — currently supports **D-LIO** (online + offline), **FAST-LIO** (online + offline), **GLIM** (offline), and **DG-KILO** (online + offline), with an extensible layout for adding more.
 
 ## Table of contents
 
@@ -20,6 +20,11 @@ Choose your SLAM algorithm — currently supports **D-LIO** (online + offline), 
 - [Quick start: Desktop replay of recorded FAST-LIO outputs](#quick-start-desktop-replay-of-recorded-fast-lio-outputs)
 - [Quick start: Desktop offline FAST-LIO reconstruction](#quick-start-desktop-offline-fast-lio-reconstruction)
 - [Quick start: Desktop offline GLIM processing](#quick-start-desktop-offline-glim-processing)
+- [Quick start: Online DG-KILO (on robot)](#quick-start-online-dg-kilo-on-robot)
+- [Quick start: Record raw legged sensor data (for DG-KILO)](#quick-start-record-raw-legged-sensor-data-for-dg-kilo)
+- [Quick start: Record DG-KILO outputs (on robot)](#quick-start-record-dg-kilo-outputs-on-robot)
+- [Quick start: Desktop replay of recorded DG-KILO outputs](#quick-start-desktop-replay-of-recorded-dg-kilo-outputs)
+- [Quick start: Desktop offline DG-KILO reconstruction](#quick-start-desktop-offline-dg-kilo-reconstruction)
 - [Catmux sessions](#catmux-sessions)
 - [Adding a new SLAM algorithm](#adding-a-new-slam-algorithm)
 - [License](#license)
@@ -33,7 +38,8 @@ slam-go2w/
 │   ├── unitree_ros2/               Unitree DDS + messages (submodule)
 │   ├── go2w-hesai-lidar-driver/    Hesai XT16 driver (submodule)
 │   ├── direct_lidar_inertial_odometry/  D-LIO algorithm (submodule)
-│   └── fast_lio_ros2/              FAST-LIO algorithm (submodule)
+│   ├── fast_lio_ros2/              FAST-LIO algorithm (submodule)
+│   └── dg_kilo/                    DG-KILO algorithm (in-tree)
 ├── docker/
 │   ├── robot/                      ARM64 robot Docker image
 │   └── desktop/glim/               Desktop GLIM offline wrapper
@@ -43,11 +49,13 @@ slam-go2w/
 │   ├── sensor/                     Shared calibration reference
 │   ├── dlio/                       D-LIO-specific configs
 │   ├── fastlio/                    FAST-LIO-specific configs
-│   └── glim/offline/               GLIM override configs + experiments
+│   ├── glim/offline/               GLIM override configs + experiments
+│   └── dgkilo/                     DG-KILO configs (go2w.yaml + dg_kilo.rviz)
 ├── scripts/
 │   ├── dlio/                       D-LIO offline scripts
 │   ├── fastlio/                    FAST-LIO offline scripts
-│   └── glim/                       GLIM offline pipeline scripts
+│   ├── glim/                       GLIM offline pipeline scripts
+│   └── dgkilo/                     DG-KILO offline scripts
 ├── tools/                          Bag validation and analysis tools
 └── output/                         Run artifacts (gitignored)
 ```
@@ -224,6 +232,73 @@ RViz2 opens automatically alongside the bag player. The bag plays once. Close th
 
 Use this reconstruction flow for raw sensor bags such as `humble_ws/bags/raw_YYYYMMDD_HHMMSS`. Use `scripts/fastlio/playback.sh` only for bags that already contain recorded FAST-LIO outputs such as `fastlio_YYYYMMDD_HHMMSS`.
 
+## Quick start: Online DG-KILO (on robot)
+
+DG-KILO fuses LiDAR, IMU, and **leg joint encoders** from `/lowstate` for improved
+z-drift and degraded-scene robustness. See `humble_ws/src/dg_kilo/README.md` for algorithm details.
+
+Complete the [Setup](#setup) steps first, then:
+
+```bash
+catmux_create_session /external/catmux/online_dgkilo.yaml
+```
+
+To visualize live DG-KILO output on the desktop over WiFi, run inside the devcontainer:
+
+```bash
+bash scripts/dgkilo/live_rviz.sh --iface enp97s0
+```
+
+## Quick start: Record raw legged sensor data (for DG-KILO)
+
+DG-KILO requires `/lowstate` (joint encoders + IMU) in addition to `/go2w/imu` and `/points_raw`.
+**Existing raw bags (captured with `record_raw.yaml`) will not work** — record a new bag:
+
+```bash
+catmux_create_session /external/catmux/record_raw_legged.yaml
+```
+
+Bags are saved to `/external/bags/raw_legged_YYYYMMDD_HHMMSS`.
+
+## Quick start: Record DG-KILO outputs (on robot)
+
+Use this workflow when you want a compact replay bag that contains the online DG-KILO outputs:
+```bash
+catmux_create_session /external/catmux/record_dgkilo.yaml
+```
+
+This session runs the same live robot-side stack as `online_dgkilo.yaml` and additionally records:
+- `/dg_kilo/odom`
+- `/dg_kilo/leg_odom`
+- `/dg_kilo/path`
+- `/dg_kilo/map`
+- `/dg_kilo/degradation`
+- `/tf`
+- `/tf_static`
+
+Bags are saved to `/external/bags/dgkilo_YYYYMMDD_HHMMSS`.
+
+## Quick start: Desktop replay of recorded DG-KILO outputs
+
+1. Open this repository in VS Code and reopen it in the devcontainer.
+2. Once the container is ready, open an integrated terminal and run:
+   ```bash
+   bash scripts/dgkilo/playback.sh humble_ws/bags/dgkilo_YYYYMMDD_HHMMSS
+   ```
+
+RViz2 opens automatically alongside the bag player. The bag plays once. Close the RViz2 window or press `Ctrl+C` to stop both.
+
+## Quick start: Desktop offline DG-KILO reconstruction
+
+1. Open this repository in VS Code and reopen it in the devcontainer.
+2. Once the container is ready, run reconstruction from a raw **legged** bag:
+   ```bash
+   bash scripts/dgkilo/reconstruct_raw.sh humble_ws/bags/raw_legged_YYYYMMDD_HHMMSS
+   ```
+
+The script validates that the bag contains `/lowstate` and will print a clear error if not.
+Reconstruction opens RViz2 and writes per-frame diagnostics to `/tmp/dg_kilo_diag.csv`.
+
 ## Quick start: Desktop offline GLIM processing
 
 Run this section from a normal Ubuntu host shell, not from the devcontainer.
@@ -258,6 +333,11 @@ Run this section from a normal Ubuntu host shell, not from the devcontainer.
 | FAST-LIO online | `catmux/online_fastlio.yaml` | Online FAST-LIO (sensors + SLAM) |
 | FAST-LIO record | `catmux/record_fastlio.yaml` | Record FAST-LIO SLAM outputs |
 | FAST-LIO playback | `catmux/playback_fastlio.yaml` | Replay recorded FAST-LIO outputs |
+| DG-KILO online | `catmux/online_dgkilo.yaml` | Online DG-KILO (sensors + SLAM) |
+| Raw legged record | `catmux/record_raw_legged.yaml` | Record raw inputs incl. /lowstate for DG-KILO |
+| DG-KILO record | `catmux/record_dgkilo.yaml` | Record DG-KILO SLAM outputs |
+| DG-KILO playback | `catmux/playback_dgkilo.yaml` | Replay recorded DG-KILO outputs |
+| DG-KILO reconstruct | `catmux/reconstruct_raw_dgkilo.yaml` | Offline DG-KILO from raw legged bag |
 
 Create any of these tmux sessions with `catmux_create_session /external/<path-to-yaml>`.
 For example, to record D-LIO outputs:

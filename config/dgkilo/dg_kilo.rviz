@@ -1,0 +1,67 @@
+Panels:
+  - Class: rviz_common/Displays
+    Name: Displays
+  - Class: rviz_common/Views
+    Name: Views
+Visualization Manager:
+  Class: ""
+  Displays:
+    - Alpha: 0.5
+      Cell Size: 1.0
+      Class: rviz_default_plugins/Grid
+      Color: 160; 160; 164
+      Name: Grid
+    - Class: rviz_default_plugins/TF
+      Name: TF
+      ShowAxes: false
+      ShowNames: false
+    - Class: rviz_default_plugins/Odometry
+      Name: Odometry
+      Topic:
+        Value: /dg_kilo/odom
+    - Class: rviz_default_plugins/Path
+      Color: 0; 255; 0
+      Name: Path
+      Topic:
+        Value: /dg_kilo/path
+    - Class: rviz_default_plugins/PointCloud2
+      Color Transformer: AxisColor
+      Name: Map
+      Topic:
+        Value: /dg_kilo/map
+    - Class: rviz_default_plugins/PointCloud2
+      Color Transformer: FlatColor
+      Color: 255; 0; 0
+      Name: Edge Features
+      Topic:
+        Value: /dg_kilo/features/edge
+    - Class: rviz_default_plugins/PointCloud2
+      Color Transformer: FlatColor
+      Color: 0; 0; 255
+      Name: Planar Features
+      Topic:
+        Value: /dg_kilo/features/planar
+    - Class: rviz_default_plugins/PointCloud2
+      Color Transformer: FlatColor
+      Color: 255; 165; 0
+      Name: Intensity Features
+      Topic:
+        Value: /dg_kilo/features/intensity
+    - Class: rviz_default_plugins/MarkerArray
+      Name: Foot Contacts
+      Topic:
+        Value: /dg_kilo/foot_contacts
+    - Class: rviz_default_plugins/Marker
+      Name: Ground Plane
+      Topic:
+        Value: /dg_kilo/ground_plane
+    - Class: rviz_default_plugins/Marker
+      Name: Loop Closure
+      Topic:
+        Value: /dg_kilo/loop_marker
+  Global Options:
+    Fixed Frame: odom
+  Views:
+    Current:
+      Class: rviz_default_plugins/Orbit
+      Distance: 20
