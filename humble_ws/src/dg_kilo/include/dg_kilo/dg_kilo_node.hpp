@@ -7,6 +7,7 @@
 #include <visualization_msgs/msg/marker_array.hpp>
 #include <tf2_ros/transform_broadcaster.h>
 #include <tf2_ros/static_transform_broadcaster.h>
+#include <fstream>
 
 #include "dg_kilo/params.hpp"
 #include "dg_kilo/lowstate_buffer.hpp"

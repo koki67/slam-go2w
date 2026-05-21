@@ -2,7 +2,11 @@
 #include <string>
 #include <vector>
 #include <Eigen/Core>
-#include <rclcpp/rclcpp.hpp>
+#include <Eigen/Geometry>
+
+namespace rclcpp {
+class Node;
+}
 
 namespace dg_kilo {
 
