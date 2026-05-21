@@ -1,0 +1,47 @@
+<?xml version="1.0"?>
+<package format="3">
+  <name>dg_kilo</name>
+  <version>0.1.0</version>
+  <description>
+    DG-KILO: Kinematic-Inertial-LiDAR Odometry with Degradation Optimization
+    and Ground Constraints for the Unitree Go2W wheeled-legged quadruped.
+
+    Implements Xu et al., "DG-KILO: A Kinematic-Inertial-LiDAR Odometry Based
+    on Degradation Optimization and Ground Constraints," IEEE T-IM 2026.
+
+    Key features: IESKF LIO with Hessian-based degradation detection,
+    intensity-feature gating, adaptive scan slicing driven by leg odometry,
+    leg ESKF with rolling-wheel contact model, ground height + coplanar
+    constraints, and GTSAM iSAM2 factor graph fusing all modalities.
+  </description>
+
+  <maintainer email="67k.tanaka@gmail.com">Koki Tanaka</maintainer>
+  <license>Apache-2.0</license>
+
+  <buildtool_depend>ament_cmake</buildtool_depend>
+  <buildtool_depend>rosidl_default_generators</buildtool_depend>
+
+  <depend>rclcpp</depend>
+  <depend>geometry_msgs</depend>
+  <depend>nav_msgs</depend>
+  <depend>sensor_msgs</depend>
+  <depend>std_msgs</depend>
+  <depend>visualization_msgs</depend>
+  <depend>tf2</depend>
+  <depend>tf2_ros</depend>
+  <depend>tf2_eigen</depend>
+  <depend>tf2_geometry_msgs</depend>
+  <depend>pcl_ros</depend>
+  <depend>pcl_conversions</depend>
+  <depend>unitree_go</depend>
+
+  <exec_depend>rosidl_default_runtime</exec_depend>
+  <member_of_group>rosidl_interface_packages</member_of_group>
+
+  <test_depend>ament_cmake_gtest</test_depend>
+  <test_depend>ament_lint_auto</test_depend>
+
+  <export>
+    <build_type>ament_cmake</build_type>
+  </export>
+</package>
