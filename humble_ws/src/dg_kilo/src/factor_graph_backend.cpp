@@ -3,6 +3,7 @@
 #include <gtsam/slam/BetweenFactor.h>
 #include <gtsam/nonlinear/ISAM2.h>
 #include <gtsam/inference/Symbol.h>
+#include <boost/make_shared.hpp>
 #include <cmath>
 
 using gtsam::symbol_shorthand::X;
@@ -83,7 +84,7 @@ void FactorGraphBackend::addGroundFactor(
   gtsam::SharedNoiseModel noise =
     gtsam::noiseModel::Isotropic::Sigma(dim, 0.02);
 
-  graph_.add(std::make_shared<GroundConstraintFactor>(
+  graph_.add(boost::make_shared<GroundConstraintFactor>(
     X(key_-1),
     foot_pos_body,
     plane_normal_world,
