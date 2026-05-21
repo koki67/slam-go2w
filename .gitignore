@@ -9,6 +9,13 @@ humble_ws/log/
 # Desktop-only offline FAST-LIO build artifacts
 .devcontainer/offline_fastlio/
 
+# Desktop-only offline LIO-SAM build artifacts
+.devcontainer/offline_liosam/
+
+# LIO-SAM experiment (not yet integrated as a proper submodule or algorithm)
+config/liosam/
+humble_ws/src/lio_sam/
+
 # Docker workspace artifacts
 docker/build/
 docker/install/
