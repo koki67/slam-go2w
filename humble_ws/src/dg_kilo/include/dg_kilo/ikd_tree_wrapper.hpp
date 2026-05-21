@@ -24,15 +24,15 @@ public:
     const PointXYZI & query,
     int k,
     std::vector<PointXYZI> & pts,
-    std::vector<float> & dists) const;
+    std::vector<float> & dists);
 
   // Radius search.
   int radiusSearch(
     const PointXYZI & query,
     float radius,
-    std::vector<PointXYZI> & pts) const;
+    std::vector<PointXYZI> & pts);
 
-  size_t size() const;
+  size_t size();
 
 private:
   KD_TREE<PointXYZI> tree_;

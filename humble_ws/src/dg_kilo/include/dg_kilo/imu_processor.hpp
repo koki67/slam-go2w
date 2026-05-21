@@ -1,6 +1,7 @@
 #pragma once
 #include <deque>
 #include <Eigen/Core>
+#include <Eigen/Geometry>
 #include "dg_kilo/common_types.hpp"
 #include "dg_kilo/params.hpp"
 

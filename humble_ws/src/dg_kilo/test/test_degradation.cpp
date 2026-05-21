@@ -2,6 +2,7 @@
 #include "dg_kilo/degradation_detector.hpp"
 #include "dg_kilo/ground_constraint_factor.hpp"
 #include <gtsam/geometry/Pose3.h>
+#include <gtsam/inference/Symbol.h>
 #include <gtsam/base/numericalDerivative.h>
 
 namespace dg_kilo {

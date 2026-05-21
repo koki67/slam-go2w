@@ -2,6 +2,7 @@
 #include "dg_kilo/leg_eskf.hpp"
 #include "dg_kilo/go2w_kinematics.hpp"
 #include <cmath>
+#include <Eigen/Eigenvalues>
 
 namespace dg_kilo {
 

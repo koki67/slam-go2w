@@ -1,5 +1,6 @@
 #include "dg_kilo/ground_plane_estimator.hpp"
 #include <cmath>
+#include <Eigen/Eigenvalues>
 
 namespace dg_kilo {
 

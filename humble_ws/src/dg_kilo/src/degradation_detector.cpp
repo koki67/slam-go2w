@@ -2,6 +2,7 @@
 #include <algorithm>
 #include <cmath>
 #include <numeric>
+#include <Eigen/Eigenvalues>
 
 namespace dg_kilo {
 
