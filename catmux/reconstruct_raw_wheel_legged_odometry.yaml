@@ -1,0 +1,10 @@
+common:
+  default_window: reconstruct
+
+parameters:
+  bag: /external/bags/REPLACE_WITH_RAW_WHEEL_LEGGED_BAG_NAME
+
+windows:
+  - commands:
+      - "bash /external/scripts/wheel_legged_odometry/reconstruct_raw.sh ${bag}"
+    name: reconstruct

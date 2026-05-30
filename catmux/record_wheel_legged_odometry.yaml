@@ -1,0 +1,39 @@
+common:
+  default_window: bag_record
+
+parameters:
+  source: /external/humble_ws/install/setup.bash
+  unitree_ros2: /external/humble_ws/src/unitree_ros2/setup.sh
+
+windows:
+  - commands:
+      - source ${source}
+      - source ${unitree_ros2}
+      - ros2 launch hesai_lidar hesai_lidar_launch.py
+    name: hesai_lidar_node
+
+  - commands:
+      - source ${source}
+      - source ${unitree_ros2}
+      - ros2 launch wheel_legged_odometry wheel_legged_odometry.launch.py
+          config_path:=/external/config/wheel_legged_odometry
+          config_file:=go2w.yaml
+          lowstate_topic:=lowstate
+          rviz:=false
+    name: wheel_legged_odometry
+
+  - commands:
+      - source ${source}
+      - source ${unitree_ros2}
+      - sleep 5
+      - "ros2 bag record -o /external/bags/wheel_legged_odometry_$(date +%Y%m%d_%H%M%S)
+          /lowstate
+          /points_raw
+          /wheel_legged_odometry/odom
+          /wheel_legged_odometry/path
+          /wheel_legged_odometry/joint_states
+          /wheel_legged_odometry/support_markers
+          /robot_description
+          /tf
+          /tf_static"
+    name: bag_record
