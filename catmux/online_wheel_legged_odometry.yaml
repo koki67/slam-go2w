@@ -9,6 +9,12 @@ windows:
   - commands:
       - source ${source}
       - source ${unitree_ros2}
+      - ros2 run go2w_imu_publisher imu_publisher
+    name: imu_publisher
+
+  - commands:
+      - source ${source}
+      - source ${unitree_ros2}
       - ros2 launch hesai_lidar hesai_lidar_launch.py
     name: hesai_lidar_node
 
