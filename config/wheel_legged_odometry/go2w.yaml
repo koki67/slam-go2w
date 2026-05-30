@@ -1,0 +1,52 @@
+###############################################################################
+# Force-free 16-joint kinematic odometry for Unitree Go2W.
+#
+# The estimator treats the four wheel tips as candidate kinematic support
+# constraints. It does not require foot-force contact sensing.
+###############################################################################
+
+/**:
+  ros__parameters:
+    lowstate_topic: lowstate
+
+    odom_topic: /wheel_legged_odometry/odom
+    path_topic: /wheel_legged_odometry/path
+    joint_state_topic: /wheel_legged_odometry/joint_states
+    marker_topic: /wheel_legged_odometry/support_markers
+
+    odom_frame: odom
+    base_frame: base_link
+    publish_tf: true
+
+    path_publish_rate_hz: 20.0
+    marker_publish_rate_hz: 20.0
+    path_max_poses: 10000
+
+    # Ordered by leg: FL, FR, RL, RR. Each leg is hip, thigh, calf, wheel.
+    # Matches the Go2W deploy configs under unitree_rl_mjlab_research:
+    # FL=3/4/5/13, FR=0/1/2/12, RL=9/10/11/15, RR=6/7/8/14.
+    motor_indices: [3, 4, 5, 13, 0, 1, 2, 12, 9, 10, 11, 15, 6, 7, 8, 14]
+
+    # Positive Unitree wheel joint velocity creates negative contact surface
+    # velocity along the local rolling tangent in the MuJoCo/URDF convention.
+    # Flip these signs if a live straight-drive bag moves backward in odom.
+    wheel_velocity_sign: [-1.0, -1.0, -1.0, -1.0]
+
+    kinematics:
+      hip_x: 0.1934
+      hip_y: 0.0465
+      thigh_y: 0.0955
+      thigh_length: 0.213
+      calf_to_wheel: 0.2264
+      wheel_radius: 0.0513
+
+    # Force-free support inference.
+    support_height_sigma: 0.06
+    residual_sigma: 0.25
+    min_support_weight: 0.03
+    robust_iterations: 3
+
+    # IMU yaw-rate is a stabilizing prior, not the only source of yaw.
+    imu_yaw_rate_weight: 1.0
+    solver_damping: 1.0e-6
+    base_height_filter_alpha: 0.15
