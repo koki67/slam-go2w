@@ -199,15 +199,18 @@ private:
     // computing dt from consecutive tick-based stamps can under-report the
     // true interval (e.g. 1 ms instead of ~2 ms at 500 Hz), which would
     // under-integrate wheel velocities by ~2x.
-    static rclcpp::Time last_wall_stamp{0, 0, RCL_STEADY_TIME};
+    // Use std::chrono::steady_clock to avoid rclcpp::Time clock-source
+    // mixing (get_clock()->now() returns RCL_ROS_TIME, not RCL_STEADY_TIME).
+    static std::chrono::steady_clock::time_point last_wall_stamp{};
     double dt = 0.002;
-    if (last_wall_stamp != rclcpp::Time{0, 0, RCL_STEADY_TIME}) {
-      dt = (get_clock()->now() - last_wall_stamp).seconds();
+    if (last_wall_stamp != std::chrono::steady_clock::time_point{}) {
+      dt = std::chrono::duration<double>(
+        std::chrono::steady_clock::now() - last_wall_stamp).count();
       if (dt <= 0.0) {
         dt = 0.002;
       }
     }
-    last_wall_stamp = get_clock()->now();
+    last_wall_stamp = std::chrono::steady_clock::now();
 
     last_stamp_ = stamp;
     have_last_stamp_ = true;
