@@ -125,7 +125,9 @@ EstimatorUpdate OdometryEstimator::update(
       Eigen::Matrix<double, 2, 3> A;
       A << 1.0, 0.0, -p.y(),
            0.0, 1.0,  p.x();
-      Eigen::Vector2d rhs(-known_velocity[leg].x(), -known_velocity[leg].y());
+      Eigen::Vector2d rhs;
+      rhs.x() = -known_velocity[leg].x() - sample.gyro.y() * p.z();
+      rhs.y() = -known_velocity[leg].y() + sample.gyro.x() * p.z();
       const double w = std::sqrt(std::max(0.0, weights[leg]));
       H += (w * A).transpose() * (w * A);
       b += (w * A).transpose() * (w * rhs);
@@ -144,8 +146,10 @@ EstimatorUpdate OdometryEstimator::update(
     for (int leg = 0; leg < 4; ++leg) {
       const Eigen::Vector3d & p = contact_base[leg];
       Eigen::Vector2d residual;
-      residual.x() = twist.x() - twist.z() * p.y() + known_velocity[leg].x();
-      residual.y() = twist.y() + twist.z() * p.x() + known_velocity[leg].y();
+      residual.x() = twist.x() - twist.z() * p.y() +
+        sample.gyro.y() * p.z() + known_velocity[leg].x();
+      residual.y() = twist.y() + twist.z() * p.x() -
+        sample.gyro.x() * p.z() + known_velocity[leg].y();
       supports[leg].residual = residual;
       weights[leg] = gaussianWeight(
         supports[leg].height,
