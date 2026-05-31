@@ -15,13 +15,28 @@ EXTRA_ARGS=("$@")
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
-ROS_SETUP="/opt/ros/humble/setup.bash"
 RVIZ_CFG="$REPO_ROOT/config/wheel_legged_odometry/wheel_legged_odometry.rviz"
+
+source_setup_safely() {
+    local setup_script="$1"
+    local restore_nounset=0
+    local rc=0
+    case $- in *u*) restore_nounset=1; set +u ;; esac
+    export COLCON_TRACE="${COLCON_TRACE-}"
+    # shellcheck source=/dev/null
+    source "$setup_script" || rc=$?
+    if [ "$restore_nounset" -eq 1 ]; then set -u; fi
+    return "$rc"
+}
 WS_SETUP=""
 WS_SETUP_CANDIDATES=(
     "$REPO_ROOT/humble_ws/install/setup.bash"
     "$REPO_ROOT/.devcontainer/offline_dgkilo/install/setup.bash"
 )
+
+# Resolve ROS setup path from ROS_DISTRO (or fall back to humble).
+ros_distro="${ROS_DISTRO:-humble}"
+ROS_SETUP="/opt/ros/${ros_distro}/setup.bash"
 
 if [ ! -d "$BAG" ] && [ -d "$REPO_ROOT/$BAG" ]; then BAG="$REPO_ROOT/$BAG"; fi
 if [ ! -d "$BAG" ]; then echo "Error: bag directory not found: $BAG" >&2; exit 1; fi
@@ -56,8 +71,8 @@ if [ -z "$WS_SETUP" ]; then
     exit 1
 fi
 
-source "$ROS_SETUP"
-source "$WS_SETUP"
+source_setup_safely "$ROS_SETUP"
+source_setup_safely "$WS_SETUP"
 
 if ! ros2 pkg prefix wheel_legged_odometry >/dev/null 2>&1; then
     echo "Error: wheel_legged_odometry is not available after sourcing $WS_SETUP" >&2

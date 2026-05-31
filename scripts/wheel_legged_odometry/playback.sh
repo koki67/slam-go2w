@@ -13,7 +13,10 @@ EXTRA_ARGS=("$@")
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
 RVIZ_CFG="$REPO_ROOT/config/wheel_legged_odometry/wheel_legged_odometry.rviz"
-ROS_SETUP="/opt/ros/humble/setup.bash"
+
+# Resolve ROS setup path from ROS_DISTRO (or fall back to humble).
+ros_distro="${ROS_DISTRO:-humble}"
+ROS_SETUP="/opt/ros/${ros_distro}/setup.bash"
 
 source_setup_safely() {
     local setup_script="$1"
