@@ -20,7 +20,7 @@
 
     path_publish_rate_hz: 20.0
     marker_publish_rate_hz: 20.0
-    path_max_poses: 10000
+    path_max_poses: 1000
 
     # Ordered by leg: FL, FR, RL, RR. Each leg is hip, thigh, calf, wheel.
     # Matches the Go2W deploy configs under unitree_rl_mjlab_research:

@@ -125,7 +125,7 @@ private:
     odom_frame_ = declare_parameter<std::string>("odom_frame", "odom");
     base_frame_ = declare_parameter<std::string>("base_frame", "base_link");
     publish_tf_ = declare_parameter<bool>("publish_tf", true);
-    path_max_poses_ = declare_parameter<int>("path_max_poses", 10000);
+    path_max_poses_ = declare_parameter<int>("path_max_poses", 1000);
     path_publish_period_ = 1.0 / std::max(
       1.0, declare_parameter<double>("path_publish_rate_hz", 20.0));
     marker_publish_period_ = 1.0 / std::max(
@@ -395,7 +395,7 @@ private:
   std::string odom_frame_;
   std::string base_frame_;
   bool publish_tf_ = true;
-  int path_max_poses_ = 10000;
+  int path_max_poses_ = 1000;
   double path_publish_period_ = 0.05;
   double marker_publish_period_ = 0.05;
 
