@@ -194,24 +194,18 @@ private:
   {
     const rclcpp::Time stamp = tickToRosTime(msg->tick);
 
-    // Derive dt from wall-clock (steady) time between callbacks.
-    // The tick counter is not guaranteed to advance at 1 ms per tick, so
-    // computing dt from consecutive tick-based stamps can under-report the
-    // true interval (e.g. 1 ms instead of ~2 ms at 500 Hz), which would
-    // under-integrate wheel velocities by ~2x.
-    // Use std::chrono::steady_clock to avoid rclcpp::Time clock-source
-    // mixing (get_clock()->now() returns RCL_ROS_TIME, not RCL_STEADY_TIME).
-    static std::chrono::steady_clock::time_point last_wall_stamp{};
+    // Derive dt from the ROS time delta between consecutive stamps so that
+    // the integration step matches the odom stamp progression in both live
+    // and replay modes. In replay the bag player controls callback cadence,
+    // so wall-clock dt would silently diverge from the stamp progression
+    // whenever the player runs faster or slower than real-time.
     double dt = 0.002;
-    if (last_wall_stamp != std::chrono::steady_clock::time_point{}) {
-      dt = std::chrono::duration<double>(
-        std::chrono::steady_clock::now() - last_wall_stamp).count();
+    if (have_last_stamp_) {
+      dt = (stamp - last_stamp_).seconds();
       if (dt <= 0.0) {
         dt = 0.002;
       }
     }
-    last_wall_stamp = std::chrono::steady_clock::now();
-
     last_stamp_ = stamp;
     have_last_stamp_ = true;
 
@@ -300,6 +294,32 @@ private:
     odom.twist.twist.angular.x = state.angular_velocity_base.x();
     odom.twist.twist.angular.y = state.angular_velocity_base.y();
     odom.twist.twist.angular.z = state.angular_velocity_base.z();
+
+    // Set covariance proportional to support quality so downstream fusers
+    // (AMCL, robot_localization/EKF, nav2) can correctly balance this
+    // odometry against other sources. Zero covariance means infinite
+    // confidence, which is misleading for a kinematic estimator that
+    // relies on force-free support inference.
+    double total_weight = 0.0;
+    double mean_residual = 0.0;
+    for (const auto & s : update.supports) {
+      total_weight += s.weight;
+      mean_residual += s.residual.norm();
+    }
+    mean_residual /= std::max(1, static_cast<int>(update.supports.size()));
+
+    // Scale: confidence increases with more/better support.
+    const double pose_var =
+      std::max(1.0e-6, 1.0e-3 * (1.0 - total_weight * 0.25) *
+                     (1.0 + mean_residual * 5.0));
+    const double twist_var =
+      std::max(1.0e-4, 1.0e-2 * (1.0 - total_weight * 0.25) *
+                     (1.0 + mean_residual * 5.0));
+    for (int i = 0; i < 6; ++i) {
+      odom.pose.covariance[i * 6 + i] = pose_var;
+      odom.twist.covariance[i * 6 + i] = twist_var;
+    }
+
     pub_odom_->publish(odom);
   }
 
