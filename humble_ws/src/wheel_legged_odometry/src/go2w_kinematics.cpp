@@ -142,7 +142,8 @@ Eigen::Vector3d Go2wKinematics::wheelCenterOnly(
     R_hip * R_thigh * R_calf *
     Eigen::Vector3d(0.0, 0.0, -params_.calf_to_wheel);
 
-  return hip_origin + p_hip_to_thigh + p_thigh_to_calf + p_calf_to_wheel;
+  return hip_origin + R_hip * p_hip_to_thigh + p_thigh_to_calf +
+    p_calf_to_wheel;
 }
 
 Eigen::Matrix3d Go2wKinematics::wheelRotationOnly(

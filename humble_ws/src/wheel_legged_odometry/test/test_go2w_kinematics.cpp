@@ -2,6 +2,7 @@
 
 #include "wheel_legged_odometry/go2w_kinematics.hpp"
 
+using wheel_legged_odometry::Go2wKinematicParameters;
 using wheel_legged_odometry::Go2wKinematics;
 using wheel_legged_odometry::LegIndex;
 using wheel_legged_odometry::LegJoints;
@@ -27,6 +28,26 @@ TEST(Go2wKinematics, StandingGeometryIsSymmetric)
   EXPECT_GT(rl.wheel_center_base.y(), 0.0);
   EXPECT_LT(rr.wheel_center_base.y(), 0.0);
   EXPECT_NEAR(fl.wheel_center_base.z(), fr.wheel_center_base.z(), 1.0e-9);
+}
+
+TEST(Go2wKinematics, HipToThighOffsetRotatesWithHipJoint)
+{
+  Go2wKinematicParameters params;
+  params.hip_x = 0.0;
+  params.hip_y = 0.0;
+  params.thigh_y = 1.0;
+  params.thigh_length = 0.0;
+  params.calf_to_wheel = 0.0;
+
+  Go2wKinematics kin(params);
+  LegJoints q;
+  q.hip = 1.5707963267948966;
+
+  const auto fl = kin.evaluate(static_cast<int>(LegIndex::FL), q);
+
+  EXPECT_NEAR(fl.wheel_center_base.x(), 0.0, 1.0e-9);
+  EXPECT_NEAR(fl.wheel_center_base.y(), 0.0, 1.0e-9);
+  EXPECT_NEAR(fl.wheel_center_base.z(), 1.0, 1.0e-9);
 }
 
 TEST(Go2wKinematics, RollingTangentFollowsBodyForwardAxisAtNeutralPose)
