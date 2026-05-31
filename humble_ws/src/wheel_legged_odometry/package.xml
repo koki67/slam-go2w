@@ -22,6 +22,8 @@
   <depend>tf2</depend>
   <depend>tf2_ros</depend>
   <depend>unitree_go</depend>
+  <build_depend>eigen</build_depend>
+  <build_export_depend>eigen</build_export_depend>
 
   <exec_depend>robot_state_publisher</exec_depend>
   <exec_depend>rviz2</exec_depend>
