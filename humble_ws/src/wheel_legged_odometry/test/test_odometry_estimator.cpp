@@ -1,3 +1,5 @@
+#include <cmath>
+
 #include <gtest/gtest.h>
 
 #include "wheel_legged_odometry/odometry_estimator.hpp"
@@ -85,6 +87,23 @@ TEST(OdometryEstimator, WheelRollingCanMoveBaseWithoutLegMotion)
 
   EXPECT_GT(update.state.linear_velocity_base.x(), 0.02);
   EXPECT_GT(update.state.position.x(), 0.0);
+}
+
+TEST(OdometryEstimator, RollPitchRatesAreCompensatedInSupportResiduals)
+{
+  OdometryEstimator estimator;
+
+  LowStateSample sample = standingSample();
+  estimator.update(sample, 0.002);
+  sample.gyro.x() = 0.7;
+  sample.gyro.y() = -0.4;
+  const auto update = estimator.update(sample, 0.02);
+
+  EXPECT_GT(std::abs(update.state.linear_velocity_base.x()), 0.05);
+  EXPECT_GT(std::abs(update.state.linear_velocity_base.y()), 0.05);
+  for (const auto & support : update.supports) {
+    EXPECT_LT(support.residual.norm(), 1.0e-3);
+  }
 }
 
 TEST(OdometryEstimator, HighSwingCandidateIsDownweighted)
