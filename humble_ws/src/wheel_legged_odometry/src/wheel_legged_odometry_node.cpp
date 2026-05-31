@@ -193,10 +193,22 @@ private:
   void lowstateCallback(const unitree_go::msg::LowState::SharedPtr msg)
   {
     const rclcpp::Time stamp = tickToRosTime(msg->tick);
+
+    // Derive dt from wall-clock (steady) time between callbacks.
+    // The tick counter is not guaranteed to advance at 1 ms per tick, so
+    // computing dt from consecutive tick-based stamps can under-report the
+    // true interval (e.g. 1 ms instead of ~2 ms at 500 Hz), which would
+    // under-integrate wheel velocities by ~2x.
+    static rclcpp::Time last_wall_stamp{0, 0, RCL_STEADY_TIME};
     double dt = 0.002;
-    if (have_last_stamp_) {
-      dt = (stamp - last_stamp_).seconds();
+    if (last_wall_stamp != rclcpp::Time{0, 0, RCL_STEADY_TIME}) {
+      dt = (get_clock()->now() - last_wall_stamp).seconds();
+      if (dt <= 0.0) {
+        dt = 0.002;
+      }
     }
+    last_wall_stamp = get_clock()->now();
+
     last_stamp_ = stamp;
     have_last_stamp_ = true;
 
