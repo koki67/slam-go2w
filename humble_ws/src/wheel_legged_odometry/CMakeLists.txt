@@ -31,6 +31,7 @@ set(dependencies
   tf2
   tf2_ros
   unitree_go
+  Eigen3
 )
 
 add_library(${PROJECT_NAME}_core

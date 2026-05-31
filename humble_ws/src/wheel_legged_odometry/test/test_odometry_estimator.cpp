@@ -118,3 +118,32 @@ TEST(OdometryEstimator, HighSwingCandidateIsDownweighted)
 
   EXPECT_LT(update.supports[0].weight, 0.5);
 }
+
+TEST(OdometryEstimator, OppositeWheelRollingIntegratesYaw)
+{
+  EstimatorParameters params;
+  params.wheel_velocity_sign = {{-1.0, -1.0, -1.0, -1.0}};
+  OdometryEstimator estimator(params);
+
+  LowStateSample sample = standingSample();
+  estimator.update(sample, 0.002);
+
+  // Drive left wheels forward and right wheels backward to spin in place.
+  sample.dq[13] = -5.0;  // FL wheel
+  sample.dq[15] = -5.0;  // RL wheel
+  sample.dq[12] = 5.0;   // FR wheel
+  sample.dq[14] = 5.0;   // RR wheel
+
+  const auto update = estimator.update(sample, 0.1);
+
+  // The base should rotate (yaw) with a measurable angular velocity.
+  EXPECT_GT(std::abs(update.state.angular_velocity_base.z()), 0.1);
+
+  // After multiple steps the yaw angle should accumulate.
+  auto later = update;
+  for (int i = 0; i < 10; ++i) {
+    later = estimator.update(sample, 0.05);
+  }
+  const double yaw = Eigen::Quaterniond(later.state.orientation).toRotationMatrix().eulerAngles(0, 1, 2).z();
+  EXPECT_GT(std::abs(yaw), 0.1);
+}
