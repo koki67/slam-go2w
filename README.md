@@ -335,7 +335,7 @@ Bags are saved to /external/bags/raw_wheel_legged_YYYYMMDD_HHMMSS.
 
 ## Quick start: Record wheel-legged odometry outputs (on robot)
 
-Use this workflow when you want a compact replay bag containing the odometry outputs, animated joint states, TF, and raw point cloud when available:
+Use this workflow when you want a compact replay bag containing the wheel-legged odometry outputs, animated joint states, TF, and the raw point cloud for visualization. It intentionally omits raw reconstruction inputs such as /lowstate and /go2w/imu; use `record_raw_wheel_legged.yaml` for offline reconstruction input bags:
 
 ```bash
 catmux_create_session /external/catmux/record_wheel_legged_odometry.yaml

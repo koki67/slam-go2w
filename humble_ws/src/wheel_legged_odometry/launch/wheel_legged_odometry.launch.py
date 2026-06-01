@@ -65,6 +65,24 @@ def generate_launch_description():
         ),
 
         Node(
+            package='tf2_ros',
+            executable='static_transform_publisher',
+            name='wheel_legged_lidar_static_tf',
+            output='screen',
+            arguments=[
+                '--x', '0.1634',
+                '--y', '0.0',
+                '--z', '0.116',
+                '--qx', '0.0',
+                '--qy', '0.0',
+                '--qz', '0.7071068',
+                '--qw', '0.7071068',
+                '--frame-id', 'base_link',
+                '--child-frame-id', 'hesai_lidar',
+            ],
+        ),
+
+        Node(
             package='rviz2',
             executable='rviz2',
             arguments=['-d', rviz_cfg],

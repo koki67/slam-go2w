@@ -6,11 +6,19 @@ humble_ws/log/
 # Desktop-only offline D-LIO build artifacts
 .devcontainer/offline_dlio/
 
+# Desktop-only offline DG-KILO build artifacts
+.devcontainer/offline_dgkilo/build/
+.devcontainer/offline_dgkilo/install/
+.devcontainer/offline_dgkilo/log/
+
 # Desktop-only offline FAST-LIO build artifacts
 .devcontainer/offline_fastlio/
 
 # Desktop-only offline LIO-SAM build artifacts
 .devcontainer/offline_liosam/
+
+# Desktop-only offline wheel-legged odometry build artifacts
+.devcontainer/offline_wheel_legged_odometry/
 
 # LIO-SAM experiment (not yet integrated as a proper submodule or algorithm)
 config/liosam/

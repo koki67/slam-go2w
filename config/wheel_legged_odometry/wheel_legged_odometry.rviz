@@ -16,7 +16,7 @@ Visualization Manager:
       Reference Frame: odom
       Value: true
     - Class: rviz_default_plugins/TF
-      Enabled: true
+      Enabled: false
       Frame Timeout: 15
       Frames:
         All Enabled: true
@@ -27,7 +27,7 @@ Visualization Manager:
       Show Names: false
       Tree: {}
       Update Interval: 0
-      Value: true
+      Value: false
     - Alpha: 1
       Class: rviz_default_plugins/RobotModel
       Collision Enabled: false
@@ -47,7 +47,7 @@ Visualization Manager:
       Class: rviz_default_plugins/Odometry
       Color: 255; 170; 0
       Enabled: true
-      Keep: 200
+      Keep: 1
       Name: Odometry
       Position Tolerance: 0.1
       Shape: Arrow
@@ -63,7 +63,7 @@ Visualization Manager:
       Class: rviz_default_plugins/Path
       Color: 25; 170; 255
       Enabled: true
-      Line Style: Lines
+      Line Style: Billboards
       Line Width: 0.03
       Name: Path
       Offset:
@@ -89,7 +89,7 @@ Visualization Manager:
         Reliability Policy: Reliable
         Value: /wheel_legged_odometry/support_markers
       Value: true
-    - Alpha: 0.35
+    - Alpha: 0.8
       Autocompute Intensity Bounds: true
       Class: rviz_default_plugins/PointCloud2
       Color Transformer: Intensity
@@ -99,7 +99,7 @@ Visualization Manager:
       Position Transformer: XYZ
       Queue Size: 5
       Selectable: true
-      Size (Pixels): 2
+      Size (Pixels): 5
       Size (m): 0.03
       Style: Points
       Topic:
