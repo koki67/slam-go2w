@@ -33,7 +33,6 @@ windows:
       - source ${unitree_ros2}
       - sleep 5
       - "ros2 bag record -o /external/bags/wheel_legged_odometry_$(date +%Y%m%d_%H%M%S)
-          /lowstate
           /points_raw
           /wheel_legged_odometry/odom
           /wheel_legged_odometry/path

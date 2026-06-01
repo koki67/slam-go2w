@@ -9,6 +9,11 @@ humble_ws/log/
 # Desktop-only offline FAST-LIO build artifacts
 .devcontainer/offline_fastlio/
 
+
+# Desktop-only offline wheel-legged odometry build artifacts
+.devcontainer/offline_wheel_legged_odometry/
+
+
 # Docker workspace artifacts
 docker/build/
 docker/install/
