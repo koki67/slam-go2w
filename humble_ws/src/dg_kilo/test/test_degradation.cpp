@@ -98,7 +98,7 @@ TEST_F(GroundFactorTest, AnalyticVsNumericalJacobian)
     stance_mask,
     noise);
 
-  gtsam::Pose3 pose = gtsam::Pose3::identity();
+  gtsam::Pose3 pose = gtsam::Pose3::Identity();
 
   // Analytic Jacobian
   gtsam::Matrix H_analytic;
@@ -126,7 +126,7 @@ TEST_F(GroundFactorTest, ZeroResidualOnGroundPlane)
 {
   // Place the pose such that the foot centres lie exactly on the plane
   // z = 0.5, i.e., foot_pos_world.z = 0.5 and plane n=(0,0,1), d=-0.5
-  gtsam::Pose3 pose(gtsam::Rot3::identity(), gtsam::Point3(0, 0, 0));
+  gtsam::Pose3 pose(gtsam::Rot3::Identity(), gtsam::Point3(0, 0, 0));
   GroundConstraintFactor factor(
     gtsam::Symbol('x', 0),
     foot_pos_body, normal_world, d_plane, n_prev, stance_mask, noise);
