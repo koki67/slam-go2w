@@ -79,7 +79,7 @@ if [ -d "$DGKILO_SRC" ]; then
         --base-paths "$REPO_ROOT/humble_ws/src" \
         --build-base "$DESKTOP_DGKILO_WS_ROOT/build" \
         --install-base "$DESKTOP_DGKILO_INSTALL" \
-        --packages-select dg_kilo
+        --packages-up-to dg_kilo
 
     grep -qxF "source $DESKTOP_DGKILO_INSTALL/setup.bash" ~/.bashrc || \
         echo "source $DESKTOP_DGKILO_INSTALL/setup.bash" >> ~/.bashrc
