@@ -69,7 +69,7 @@ else
 fi
 
 # DG-KILO is optional: build only when the source directory is present.
-# Requires libgtsam-dev (added to Dockerfile) — disk budget: +~300 MB.
+# Requires GTSAM 4.2 (built from source in Dockerfile) — disk budget: +~300 MB.
 if [ -d "$DGKILO_SRC" ]; then
     mkdir -p "$DESKTOP_DGKILO_WS_ROOT"
     rm -rf "$DESKTOP_DGKILO_WS_ROOT/build" "$DESKTOP_DGKILO_INSTALL" "$DESKTOP_DGKILO_WS_ROOT/log"
