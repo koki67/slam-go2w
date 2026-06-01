@@ -30,9 +30,9 @@ RUN apt-get update && apt-get install -y \
     python3-colcon-common-extensions \
     python3-rosdep \
     python3-vcstool \
-    ros-humble-pcl-conversions \
-    ros-humble-pcl-ros \
-    ros-humble-rmw-cyclonedds-cpp \
-    ros-humble-rosidl-default-generators \
-    ros-humble-tf2-geometry-msgs \
+    ros-jazzy-pcl-conversions \
+    ros-jazzy-pcl-ros \
+    ros-jazzy-rosidl-generator-dds-idl \
+    ros-jazzy-rmw-cyclonedds-cpp \
+    ros-jazzy-tf2-geometry-msgs \
     && rm -rf /var/lib/apt/lists/*
