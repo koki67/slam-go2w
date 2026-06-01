@@ -2,7 +2,7 @@
 set -eo pipefail
 
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-ROS_SETUP="/opt/ros/jazzy/setup.bash"
+ROS_SETUP="/opt/ros/humble/setup.bash"
 DLIO_SRC="$REPO_ROOT/humble_ws/src/direct_lidar_inertial_odometry"
 DESKTOP_WS_ROOT="$REPO_ROOT/.devcontainer/offline_dlio"
 DESKTOP_INSTALL="$DESKTOP_WS_ROOT/install"
@@ -38,8 +38,8 @@ colcon --log-base "$DESKTOP_WS_ROOT/log" build \
     --install-base "$DESKTOP_INSTALL" \
     --packages-select direct_lidar_inertial_odometry
 
-grep -qxF "source /opt/ros/jazzy/setup.bash" ~/.bashrc || \
-    echo "source /opt/ros/jazzy/setup.bash" >> ~/.bashrc
+grep -qxF "source /opt/ros/humble/setup.bash" ~/.bashrc || \
+    echo "source /opt/ros/humble/setup.bash" >> ~/.bashrc
 grep -qxF "source $DESKTOP_INSTALL/setup.bash" ~/.bashrc || \
     echo "source $DESKTOP_INSTALL/setup.bash" >> ~/.bashrc
 
