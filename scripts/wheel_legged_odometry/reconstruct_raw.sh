@@ -28,10 +28,40 @@ source_setup_safely() {
     if [ "$restore_nounset" -eq 1 ]; then set -u; fi
     return "$rc"
 }
+
+setup_matches_ros_distro() {
+    local setup_script="$1"
+    if grep -q "/opt/ros/" "$setup_script" 2>/dev/null && ! grep -q "/opt/ros/${ros_distro}" "$setup_script"; then
+        return 1
+    fi
+    return 0
+}
+
+build_wheel_odom_overlay() {
+    if [ ! -d "$WHEEL_ODOM_SRC" ]; then
+        echo "Error: wheel_legged_odometry source not found: $WHEEL_ODOM_SRC" >&2
+        return 1
+    fi
+
+    echo "Building wheel_legged_odometry Humble overlay: $WHEEL_ODOM_INSTALL"
+    mkdir -p "$WHEEL_ODOM_WS_ROOT"
+    rm -rf "$WHEEL_ODOM_WS_ROOT/build" "$WHEEL_ODOM_INSTALL" "$WHEEL_ODOM_WS_ROOT/log"
+
+    colcon --log-base "$WHEEL_ODOM_WS_ROOT/log" build \
+        --symlink-install \
+        --base-paths "$REPO_ROOT/humble_ws/src" \
+        --build-base "$WHEEL_ODOM_WS_ROOT/build" \
+        --install-base "$WHEEL_ODOM_INSTALL" \
+        --packages-up-to wheel_legged_odometry \
+        --cmake-args -DBUILD_TESTING=OFF
+}
 WS_SETUP=""
+WHEEL_ODOM_WS_ROOT="$REPO_ROOT/.devcontainer/offline_wheel_legged_odometry"
+WHEEL_ODOM_INSTALL="$WHEEL_ODOM_WS_ROOT/install"
+WHEEL_ODOM_SRC="$REPO_ROOT/humble_ws/src/wheel_legged_odometry"
 WS_SETUP_CANDIDATES=(
+    "$WHEEL_ODOM_INSTALL/setup.bash"
     "$REPO_ROOT/humble_ws/install/setup.bash"
-    "$REPO_ROOT/.devcontainer/offline_dgkilo/install/setup.bash"
 )
 
 # Resolve ROS setup path from ROS_DISTRO (or fall back to humble).
@@ -63,16 +93,28 @@ CLOCK_ARG=(--clock)
 if grep -qxF "/clock" <<< "$bag_topics"; then CLOCK_ARG=(); fi
 
 if [ ! -f "$ROS_SETUP" ]; then echo "Error: ROS 2 setup not found: $ROS_SETUP" >&2; exit 1; fi
-for candidate in "${WS_SETUP_CANDIDATES[@]}"; do
-    if [ -f "$candidate" ]; then WS_SETUP="$candidate"; break; fi
-done
-if [ -z "$WS_SETUP" ]; then
-    echo "Error: no workspace setup was found. Build humble_ws first." >&2
-    exit 1
-fi
 
 source_setup_safely "$ROS_SETUP"
-source_setup_safely "$WS_SETUP"
+
+for candidate in "${WS_SETUP_CANDIDATES[@]}"; do
+    if [ ! -f "$candidate" ]; then
+        continue
+    fi
+    if ! setup_matches_ros_distro "$candidate"; then
+        echo "Skipping stale workspace setup for another ROS distro: $candidate" >&2
+        continue
+    fi
+    if source_setup_safely "$candidate" && ros2 pkg prefix wheel_legged_odometry >/dev/null 2>&1; then
+        WS_SETUP="$candidate"
+        break
+    fi
+done
+
+if [ -z "$WS_SETUP" ]; then
+    build_wheel_odom_overlay
+    WS_SETUP="$WHEEL_ODOM_INSTALL/setup.bash"
+    source_setup_safely "$WS_SETUP"
+fi
 
 if ! ros2 pkg prefix wheel_legged_odometry >/dev/null 2>&1; then
     echo "Error: wheel_legged_odometry is not available after sourcing $WS_SETUP" >&2
