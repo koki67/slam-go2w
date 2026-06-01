@@ -36,7 +36,8 @@ colcon --log-base "$DESKTOP_WS_ROOT/log" build \
     --base-paths "$DLIO_SRC" \
     --build-base "$DESKTOP_WS_ROOT/build" \
     --install-base "$DESKTOP_INSTALL" \
-    --packages-select direct_lidar_inertial_odometry
+    --packages-select direct_lidar_inertial_odometry \
+    --cmake-args -DBUILD_TESTING=OFF
 
 grep -qxF "source /opt/ros/humble/setup.bash" ~/.bashrc || \
     echo "source /opt/ros/humble/setup.bash" >> ~/.bashrc
@@ -56,7 +57,8 @@ if [ -d "$FASTLIO_SRC" ]; then
         --base-paths "$FASTLIO_SRC" \
         --build-base "$DESKTOP_FASTLIO_WS_ROOT/build" \
         --install-base "$DESKTOP_FASTLIO_INSTALL" \
-        --packages-select fast_lio
+        --packages-select fast_lio \
+        --cmake-args -DBUILD_TESTING=OFF
 
     grep -qxF "source $DESKTOP_FASTLIO_INSTALL/setup.bash" ~/.bashrc || \
         echo "source $DESKTOP_FASTLIO_INSTALL/setup.bash" >> ~/.bashrc
@@ -79,7 +81,8 @@ if [ -d "$DGKILO_SRC" ]; then
         --base-paths "$REPO_ROOT/humble_ws/src" \
         --build-base "$DESKTOP_DGKILO_WS_ROOT/build" \
         --install-base "$DESKTOP_DGKILO_INSTALL" \
-        --packages-up-to dg_kilo
+        --packages-up-to dg_kilo \
+        --cmake-args -DBUILD_TESTING=OFF
 
     grep -qxF "source $DESKTOP_DGKILO_INSTALL/setup.bash" ~/.bashrc || \
         echo "source $DESKTOP_DGKILO_INSTALL/setup.bash" >> ~/.bashrc
