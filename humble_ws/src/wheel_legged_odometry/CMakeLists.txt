@@ -42,7 +42,7 @@ target_include_directories(${PROJECT_NAME}_core PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
   $<INSTALL_INTERFACE:include>
 )
-target_link_libraries(${PROJECT_NAME}_core PUBLIC Eigen3::Eigen)
+target_link_libraries(${PROJECT_NAME}_core Eigen3::Eigen)
 ament_target_dependencies(${PROJECT_NAME}_core ${dependencies})
 
 add_executable(wheel_legged_odometry_node src/wheel_legged_odometry_node.cpp)
