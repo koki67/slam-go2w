@@ -2,7 +2,7 @@
 
 Unified SLAM repository for the Unitree GO2-W robot with Hesai PandarXT-16 LiDAR.
 
-Choose your SLAM algorithm — currently supports **D-LIO** (online + offline), **FAST-LIO** (online + offline), and **GLIM** (offline), with an extensible layout for adding more.
+Choose your SLAM/odometry algorithm — currently supports **D-LIO** (online + offline), **FAST-LIO** (online + offline), **GLIM** (offline), and **wheel-legged odometry** (online + offline), with an extensible layout for adding more.
 
 ## Table of contents
 
@@ -20,6 +20,11 @@ Choose your SLAM algorithm — currently supports **D-LIO** (online + offline), 
 - [Quick start: Desktop replay of recorded FAST-LIO outputs](#quick-start-desktop-replay-of-recorded-fast-lio-outputs)
 - [Quick start: Desktop offline FAST-LIO reconstruction](#quick-start-desktop-offline-fast-lio-reconstruction)
 - [Quick start: Desktop offline GLIM processing](#quick-start-desktop-offline-glim-processing)
+- [Quick start: Online wheel-legged odometry (on robot)](#quick-start-online-wheel-legged-odometry-on-robot)
+- [Quick start: Record raw wheel-legged sensor data](#quick-start-record-raw-wheel-legged-sensor-data)
+- [Quick start: Record wheel-legged odometry outputs (on robot)](#quick-start-record-wheel-legged-odometry-outputs-on-robot)
+- [Quick start: Desktop replay of recorded wheel-legged odometry outputs](#quick-start-desktop-replay-of-recorded-wheel-legged-odometry-outputs)
+- [Quick start: Desktop offline wheel-legged odometry reconstruction](#quick-start-desktop-offline-wheel-legged-odometry-reconstruction)
 - [Catmux sessions](#catmux-sessions)
 - [Adding a new SLAM algorithm](#adding-a-new-slam-algorithm)
 - [License](#license)
@@ -33,7 +38,8 @@ slam-go2w/
 │   ├── unitree_ros2/               Unitree DDS + messages (submodule)
 │   ├── go2w-hesai-lidar-driver/    Hesai XT16 driver (submodule)
 │   ├── direct_lidar_inertial_odometry/  D-LIO algorithm (submodule)
-│   └── fast_lio_ros2/              FAST-LIO algorithm (submodule)
+│   ├── fast_lio_ros2/              FAST-LIO algorithm (submodule)
+│   └── wheel_legged_odometry/       16-joint Go2W kinematic odometry (in-tree)
 ├── docker/
 │   ├── robot/                      ARM64 robot Docker image
 │   └── desktop/glim/               Desktop GLIM offline wrapper
@@ -43,11 +49,13 @@ slam-go2w/
 │   ├── sensor/                     Shared calibration reference
 │   ├── dlio/                       D-LIO-specific configs
 │   ├── fastlio/                    FAST-LIO-specific configs
-│   └── glim/offline/               GLIM override configs + experiments
+│   ├── glim/offline/               GLIM override configs + experiments
+│   └── wheel_legged_odometry/      Wheel-legged odometry configs + RViz
 ├── scripts/
 │   ├── dlio/                       D-LIO offline scripts
 │   ├── fastlio/                    FAST-LIO offline scripts
-│   └── glim/                       GLIM offline pipeline scripts
+│   ├── glim/                       GLIM offline pipeline scripts
+│   └── wheel_legged_odometry/      Wheel-legged odometry replay scripts
 ├── tools/                          Bag validation and analysis tools
 └── output/                         Run artifacts (gitignored)
 ```
@@ -224,6 +232,56 @@ RViz2 opens automatically alongside the bag player. The bag plays once. Close th
 
 Use this reconstruction flow for raw sensor bags such as `humble_ws/bags/raw_YYYYMMDD_HHMMSS`. Use `scripts/fastlio/playback.sh` only for bags that already contain recorded FAST-LIO outputs such as `fastlio_YYYYMMDD_HHMMSS`.
 
+## Quick start: Online wheel-legged odometry (on robot)
+
+This package estimates Go2W odometry from all 16 low-level motor states and IMU attitude/rates. It does not require foot-force contact sensing, and /points_raw is visualized only when the Hesai driver is running.
+
+Complete the [Setup](#setup) steps first, then:
+
+```bash
+catmux_create_session /external/catmux/online_wheel_legged_odometry.yaml
+```
+
+To visualize live output on the desktop over WiFi, run inside the devcontainer:
+
+```bash
+bash scripts/wheel_legged_odometry/live_rviz.sh --iface enp97s0
+```
+
+## Quick start: Record raw wheel-legged sensor data
+
+Record /lowstate plus optional visualization sensors for offline reconstruction:
+
+```bash
+catmux_create_session /external/catmux/record_raw_wheel_legged.yaml
+```
+
+Bags are saved to /external/bags/raw_wheel_legged_YYYYMMDD_HHMMSS.
+
+## Quick start: Record wheel-legged odometry outputs (on robot)
+
+Use this workflow when you want a compact replay bag containing the wheel-legged odometry outputs, animated joint states, TF, and the raw point cloud for visualization. It intentionally omits raw reconstruction inputs such as /lowstate and /go2w/imu; use `record_raw_wheel_legged.yaml` for offline reconstruction input bags:
+
+```bash
+catmux_create_session /external/catmux/record_wheel_legged_odometry.yaml
+```
+
+Bags are saved to /external/bags/wheel_legged_odometry_YYYYMMDD_HHMMSS.
+
+## Quick start: Desktop replay of recorded wheel-legged odometry outputs
+
+```bash
+bash scripts/wheel_legged_odometry/playback.sh humble_ws/bags/wheel_legged_odometry_YYYYMMDD_HHMMSS
+```
+
+## Quick start: Desktop offline wheel-legged odometry reconstruction
+
+Run the odometry node from a raw /lowstate bag and visualize the reconstructed outputs:
+
+```bash
+bash scripts/wheel_legged_odometry/reconstruct_raw.sh humble_ws/bags/raw_wheel_legged_YYYYMMDD_HHMMSS
+```
+
 ## Quick start: Desktop offline GLIM processing
 
 Run this section from a normal Ubuntu host shell, not from the devcontainer.
@@ -258,6 +316,11 @@ Run this section from a normal Ubuntu host shell, not from the devcontainer.
 | FAST-LIO online | `catmux/online_fastlio.yaml` | Online FAST-LIO (sensors + SLAM) |
 | FAST-LIO record | `catmux/record_fastlio.yaml` | Record FAST-LIO SLAM outputs |
 | FAST-LIO playback | `catmux/playback_fastlio.yaml` | Replay recorded FAST-LIO outputs |
+| Wheel-legged odometry online | `catmux/online_wheel_legged_odometry.yaml` | Online 16-joint kinematic odometry |
+| Raw wheel-legged record | `catmux/record_raw_wheel_legged.yaml` | Record raw lowstate plus visualization sensors |
+| Wheel-legged odometry record | `catmux/record_wheel_legged_odometry.yaml` | Record odometry outputs and animated robot state |
+| Wheel-legged odometry playback | `catmux/playback_wheel_legged_odometry.yaml` | Replay recorded wheel-legged odometry outputs |
+| Wheel-legged odometry reconstruct | `catmux/reconstruct_raw_wheel_legged_odometry.yaml` | Offline odometry from raw lowstate bag |
 
 Create any of these tmux sessions with `catmux_create_session /external/<path-to-yaml>`.
 For example, to record D-LIO outputs:
